@@ -1,0 +1,29 @@
+{
+    "Int": 1,
+    "Object": {
+        "name": "qq",
+        "age": 25
+    },
+    "IntArray": [
+        10,
+        20,
+        30
+    ],
+    "People": [
+        {
+            "name": "qq1",
+            "age": 0,
+            "sex": true
+        },
+        {
+            "name": "qq2",
+            "age": 10,
+            "sex": false
+        },
+        {
+            "name": "qq3",
+            "age": 20,
+            "sex": true
+        }
+    ]
+}

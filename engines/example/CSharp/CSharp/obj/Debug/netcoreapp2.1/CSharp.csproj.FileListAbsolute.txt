@@ -1,0 +1,9 @@
+D:\ServerSet\engine\example\CSharp\CSharp\bin\Debug\netcoreapp2.1\CSharp.deps.json
+D:\ServerSet\engine\example\CSharp\CSharp\bin\Debug\netcoreapp2.1\CSharp.dll
+D:\ServerSet\engine\example\CSharp\CSharp\bin\Debug\netcoreapp2.1\CSharp.pdb
+D:\ServerSet\engine\example\CSharp\CSharp\obj\Debug\netcoreapp2.1\CSharp.csprojAssemblyReference.cache
+D:\ServerSet\engine\example\CSharp\CSharp\obj\Debug\netcoreapp2.1\CSharp.csproj.CoreCompileInputs.cache
+D:\ServerSet\engine\example\CSharp\CSharp\obj\Debug\netcoreapp2.1\CSharp.AssemblyInfoInputs.cache
+D:\ServerSet\engine\example\CSharp\CSharp\obj\Debug\netcoreapp2.1\CSharp.AssemblyInfo.cs
+D:\ServerSet\engine\example\CSharp\CSharp\obj\Debug\netcoreapp2.1\CSharp.dll
+D:\ServerSet\engine\example\CSharp\CSharp\obj\Debug\netcoreapp2.1\CSharp.pdb

@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<sundry>
+    <default_hero_id>1000</default_hero_id>
+    
+    <persons>
+        <person name="1" id ="1000">
+            <sex>"man"</sex>
+            <age>30</age>
+        </person>
+        <person name="2" id ="2000">
+            <sex>"woman"</sex>
+            <age>20</age>
+        </person>   
+    </persons>
+</sundry>

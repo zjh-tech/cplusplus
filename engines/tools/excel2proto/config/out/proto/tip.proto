@@ -1,0 +1,15 @@
+syntax = "proto3";
+                     
+package   config;
+                     
+message   tip
+{ 
+   uint32  Id  =1;
+   string  Desc  =2;
+   string  Str  =3;
+   uint32  Value  =4;
+} 
+message   tipcfg
+{ 
+   map<uint32,tip>  datas=   1;
+} 
