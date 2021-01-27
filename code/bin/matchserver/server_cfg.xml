@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='utf-8'?>
+
+<config>
+    <servicename>matchserver</servicename>
+    <servertype>5</servertype>
+    <serverid>500</serverid>
+    <token>123456</token>
+
+	<logdir>./log</logdir>
+    <!--0: debug, 1: info, 2:warn 3：error -->
+    <loglevel>1</loglevel> 
+    <threadnum>0</threadnum>
+
+    <sdclient_url>localhost:100</sdclient_url>
+    <!--sdconnectip>127.0.0.1</sdconnectip-->
+    <!--sdconnectport>100</sdconnectport-->   
+
+</config>
+

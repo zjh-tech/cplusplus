@@ -1,0 +1,10 @@
+^D:\MAIN\SERVERSET\CPLUSPLUS\META\META\CMAKELISTS.TXT
+setlocal
+E:\Program\cmake\bin\cmake.exe -SD:/main/serverset/cplusplus/meta/meta -BD:/main/serverset/cplusplus/meta/meta/build --check-stamp-file D:/main/serverset/cplusplus/meta/meta/build/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
