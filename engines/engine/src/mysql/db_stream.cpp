@@ -3,7 +3,7 @@
  * @Author: zhengjinhong
  * @Date: 2020-04-14 14:57:20
  * @LastEditors: zhengjinhong
- * @LastEditTime: 2020-12-28 11:57:40
+ * @LastEditTime: 2021-01-28 17:04:53
  */
 
 #include "engine/inc/mysql/db_stream.h"
@@ -13,17 +13,12 @@
 namespace Framework {
 namespace DB {
 
-  DBStream::DBStream(shared_ptr<IMysqlConn> conn) {
-    conn_ptr   = conn;
+  DBStream::DBStream() {
     m_buff     = static_cast<char*>(malloc(sDefaultSize));
     m_capacity = sDefaultSize;
   }
 
   DBStream::~DBStream() {
-    if (conn_ptr) {
-      conn_ptr = nullptr;
-    }
-
     if (m_buff) {
       free(m_buff);
       m_buff = nullptr;
@@ -48,10 +43,6 @@ namespace DB {
       m_buff     = static_cast<char*>(realloc(m_buff, m_capacity + len + sDefaultSize * 2));
       m_capacity = m_capacity + len + sDefaultSize;
     }
-  }
-
-  string DBStream::escape_string(const string& from) {
-    return conn_ptr->EscapeString(from);
   }
 
 }  // namespace DB

@@ -3,7 +3,7 @@
  * @Author: zhengjinhong
  * @Date: 2020-04-14 14:35:01
  * @LastEditors: zhengjinhong
- * @LastEditTime: 2020-11-23 14:46:45
+ * @LastEditTime: 2021-01-28 18:44:02
  */
 
 #pragma once
@@ -23,7 +23,7 @@ namespace DB {
 
   class DBStream {
   public:
-    DBStream(shared_ptr<IMysqlConn> conn);
+    DBStream();
     virtual ~DBStream();
 
   public:
@@ -41,16 +41,15 @@ namespace DB {
     }
 
     DBStream& operator<<(const char* value) {
-      string value_str = escape_string(value);
-      ensure_capacity(value_str.size());
-      memcpy(&m_buff[m_wpos], value_str.c_str(), value_str.size());
-      m_wpos += value_str.size();
+      size_t value_len = strlen(value);
+      ensure_capacity(value_len);
+      memcpy(&m_buff[m_wpos], value, value_len);
+      m_wpos += value_len;
       return *this;
     }
 
   private:
-    void   ensure_capacity(size_t len);
-    string escape_string(const string& from);
+    void ensure_capacity(size_t len);
 
   private:
     char*  m_buff     = nullptr;
@@ -59,16 +58,13 @@ namespace DB {
     size_t m_wpos     = 0;
 
     static const size_t sDefaultSize = 64;
-
-    shared_ptr<IMysqlConn> conn_ptr;
   };
 
   template <>
   inline DBStream& DBStream::operator<<(const string& value) {
-    string value_str = escape_string(value);
-    ensure_capacity(value_str.size());
-    memcpy(&m_buff[m_wpos], value_str.c_str(), value_str.size());
-    m_wpos += value_str.size();
+    ensure_capacity(value.size());
+    memcpy(&m_buff[m_wpos], value.c_str(), value.size());
+    m_wpos += value.size();
     return *this;
   }
 

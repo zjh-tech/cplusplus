@@ -82,10 +82,12 @@ namespace DB {
       return record_set_ptr;
     }
 
+    string escape_string_sql = EscapeString(sql);
+
     //contain binary data must use mysql_real_query
-    int code = mysql_real_query(m_pConnection, sql.c_str(), (unsigned long)sql.size());
+    int code = mysql_real_query(m_pConnection, escape_string_sql.c_str(), (unsigned long)escape_string_sql.size());
     if (code != 0) {
-      LogErrorA("[db] mysql_real_query {} error {} {} ", sql.c_str(), GetErrorCode(), GetErrorMsg());
+      LogErrorA("[db] mysql_real_query {} error {} {} ", escape_string_sql.c_str(), GetErrorCode(), GetErrorMsg());
       return record_set_ptr;
     }
 
@@ -113,7 +115,7 @@ namespace DB {
 
         auto record_ptr = make_shared<DBRecord>();
         for (unsigned int i = 0; i < field_count; ++i) {
-          record_ptr->AddFieldWithoutEscapeString(fields[i].name, mysql_row[i], lengths[i]);
+          record_ptr->AddField(fields[i].name, mysql_row[i], lengths[i]);
         }
         record_set_ptr->AddDBRecord(record_ptr);
       }

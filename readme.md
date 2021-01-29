@@ -3,7 +3,7 @@
  * @Author: zhengjinhong
  * @Date: 2020-12-17 11:28:59
  * @LastEditors: zhengjinhong
- * @LastEditTime: 2021-01-26 14:52:38
+ * @LastEditTime: 2021-01-28 10:50:43
  -->
 C#:
 组件和框架跨平台: .Net Core 3.1 
@@ -28,7 +28,7 @@ Go:
 
 组件:
     日志,定时器,数据库,Redis,Tcp网络,Http(Https)等
-    数据库:同步异步API,支持分库分表,事务,数据库语句自动拼接Api
+    数据库:同步异步API,支持分库分表,事务,数据库语句自动拼接Api,SQL注入
 框架:
     服务发现,业务Session,逻辑LogicServer,信号,gops性能监控,唯一ID生成,等
     

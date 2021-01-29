@@ -3,7 +3,7 @@
  * @Author: zhengjinhong
  * @Date: 2020-04-13 18:53:43
  * @LastEditors: zhengjinhong
- * @LastEditTime: 2020-11-23 17:39:53
+ * @LastEditTime: 2021-01-29 10:36:13
  */
 
 #pragma once
@@ -32,7 +32,7 @@ namespace DB {
       return nullptr;
     }
 
-    void AddFieldWithoutEscapeString(const char* field_name, const char* buff, size_t len) {
+    void AddField(const char* field_name, const char* buff, size_t len) {
       m_field_map[field_name] = string(buff, len);
     }
 

@@ -3,7 +3,7 @@
  * @Author: zhengjinhong
  * @Date: 2020-11-20 15:21:37
  * @LastEditors: zhengjinhong
- * @LastEditTime: 2020-12-28 12:02:44
+ * @LastEditTime: 2021-01-28 16:39:38
  */
 
 #pragma once
@@ -19,8 +19,8 @@ namespace DB {
 
   class SQLTool {
   public:
-    SQLTool(shared_ptr<IMysqlConn> conn)
-      : db_stream(conn) {
+    SQLTool()
+      : db_stream() {
     }
 
   public:
