@@ -69,10 +69,50 @@ namespace DB {
   }
 
   string MySQLConn::EscapeString(const string& from) {
-    std::string to;
+    string to;
     to.resize(from.size() * 2 + 1);
-    unsigned long real_len = mysql_real_escape_string(m_pConnection, to.data(), from.c_str(), from.size());
-    to.resize(real_len);
+    size_t index = 0;
+    //method 1 :
+    index = mysql_real_escape_string(m_pConnection, to.data(), from.c_str(), from.size());
+    //method 2 :
+    // size_t      from_len  = from.size();
+    // const char* from_data = from.c_str();
+    // for (size_t i = 0; i < from_len; ++i) {
+    //   char c = from_data[i];
+    //   switch (c) {
+    //     case '\0':
+    //       to[index++] = '\\';
+    //       to[index++] = '0';
+    //       break;
+    //     case '\n':
+    //       to[index++] = '\\';
+    //       to[index++] = 'n';
+    //       break;
+    //     case '\r':
+    //       to[index++] = '\\';
+    //       to[index++] = 'r';
+    //       break;
+    //     case 0x1a:
+    //       to[index++] = '\\';
+    //       to[index++] = 'Z';
+    //       break;
+    //     case '\'':
+    //       to[index++] = '\\';
+    //       to[index++] = '\'';
+    //       break;
+    //     case '"':
+    //       to[index++] = '\\';
+    //       to[index++] = '\"';
+    //       break;
+    //     case '\\':
+    //       to[index++] = '\\';
+    //       to[index++] = '\\';
+    //       break;
+    //     default:
+    //       to[index++] = c;
+    //   }
+    // }
+    to.resize(index);
     return to;
   }
 
