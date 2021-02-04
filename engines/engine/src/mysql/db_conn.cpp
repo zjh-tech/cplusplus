@@ -82,6 +82,8 @@ namespace DB {
       return record_set_ptr;
     }
 
+    LogInfoA("[db] ExecuteSql {}", sql);
+
     //contain binary data must use mysql_real_query
     int code = mysql_real_query(m_pConnection, sql.c_str(), (unsigned long)sql.size());
     if (code != 0) {

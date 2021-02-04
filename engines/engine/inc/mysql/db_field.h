@@ -3,7 +3,7 @@
  * @Author: zhengjinhong
  * @Date: 2020-04-15 10:07:36
  * @LastEditors: zhengjinhong
- * @LastEditTime: 2021-02-04 11:11:49
+ * @LastEditTime: 2021-02-04 14:05:27
  */
 
 #pragma once
@@ -27,18 +27,30 @@ namespace DB {
   public:
     template <typename T>
     void AddField(const char* field_name, T& value) {
-      string       escape_str = escape_string(value);
       stringstream ss;
+
       if constexpr (is_same_v<const char*, T>) {
+        string escape_str = escape_string(value);
+        ss << "'";
+        ss << escape_str;
+        ss << "'";
+      } else if constexpr (is_same_v<char*, T>) {
+        string escape_str = escape_string(value);
         ss << "'";
         ss << escape_str;
         ss << "'";
       } else if constexpr (is_same_v<string, T>) {
+        string escape_str = escape_string(value);
+        ss << "'";
+        ss << escape_str;
+        ss << "'";
+      } else if constexpr (is_same_v<const string, T>) {
+        string escape_str = escape_string(value);
         ss << "'";
         ss << escape_str;
         ss << "'";
       } else {
-        ss << escape_str;
+        ss << value;
       }
 
       m_field_map[field_name] = ss.str();

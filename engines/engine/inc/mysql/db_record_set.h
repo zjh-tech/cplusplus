@@ -3,7 +3,7 @@
  * @Author: zhengjinhong
  * @Date: 2020-04-13 18:53:43
  * @LastEditors: zhengjinhong
- * @LastEditTime: 2021-01-29 10:36:13
+ * @LastEditTime: 2021-02-04 15:10:27
  */
 
 #pragma once
@@ -43,8 +43,8 @@ namespace DB {
   class DBRecordSet : public IMysqlRecordSet {
   public:
     friend class MySQLConn;
-    const vector<DBRecordPtr>& GetDBRecordVec() override {
-      return m_vec;
+    const vector<DBRecordPtr>* GetDBRecordVec() override {
+      return &m_vec;
     }
 
     int64_t GetAffectRows() override {

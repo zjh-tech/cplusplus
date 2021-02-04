@@ -2,7 +2,7 @@
  * @Author: zhengjinhong
  * @Date: 2019-11-11 10:44:56
  * @LastEditors: zhengjinhong
- * @LastEditTime: 2021-02-04 11:39:41
+ * @LastEditTime: 2021-02-04 15:45:18
  * @Description: file content
  */
 
@@ -54,39 +54,68 @@ int main(void) {
   GMysqlModule->AsyncExecCommand(
     1,
     [](shared_ptr<IMysqlConn> conn) -> tuple<int32_t, string, shared_ptr<IMysqlRecordSet>> {
-      DBFieldPair fieldPair;
+      DBFieldPair insert_pair;
       string      username = "'zjh";
       string      password = "123456";
-      fieldPair.AddField("username", username);
-      fieldPair.AddField("password", password);
+      insert_pair.AddField("username", username);
+      insert_pair.AddField("password", password);
 
-      SQLTool sqltool;
-      string  insert_sql = sqltool.GetInsertSQL("ACCOUNT", &fieldPair);
+      string insert_sql = SQLTool::GetInsertSQL("ACCOUNT", &insert_pair);
 
       shared_ptr<IMysqlRecordSet> recordset = conn->ExecuteSql(insert_sql);
-      return make_tuple(0, "", recordset);
+      if (recordset == nullptr) {
+        return make_tuple(DB_EXEC_FAIL_CODE, "Insert Fail", recordset);
+      } else {
+        return make_tuple(DB_EXEC_SUCCESS_CODE, "", recordset);
+      }
     },
     [](int32_t errorcode, string errormsg, shared_ptr<IMysqlRecordSet> recordset) {
-      if (errorcode != 0) {
+      if (errorcode != DB_EXEC_SUCCESS_CODE) {
         return;
       }
 
-      LogInfoA("Insert Ok");
+      LogInfoA("AffectRows={}, InsertId={}", recordset->GetAffectRows(), recordset->GetInsertId());
     });
 
   GMysqlModule->AsyncExecCommand(
     1,
     [](shared_ptr<IMysqlConn> conn) -> tuple<int32_t, string, shared_ptr<IMysqlRecordSet>> {
-      string                      select_sql = "select accountid,password from ACCOUNT where username = 'zjh'";
+      DBField select_key;
+      select_key.AddField("accountid");
+      select_key.AddField("password");
+
+      DBFieldPair where_pair;
+      string      username = "'zjh";
+      where_pair.AddField("username", username);
+
+      string                      select_sql = SQLTool::GetSelectSQL("ACCOUNT", &select_key, &where_pair);
       shared_ptr<IMysqlRecordSet> recordset  = conn->ExecuteSql(select_sql);
-      return make_tuple(0, "", recordset);
+      if (recordset == nullptr) {
+        return make_tuple(DB_EXEC_FAIL_CODE, "Select Fail", recordset);
+      } else {
+        return make_tuple(DB_EXEC_SUCCESS_CODE, "", recordset);
+      }
     },
     [](int32_t errorcode, string errormsg, shared_ptr<IMysqlRecordSet> recordset) {
-      if (errorcode != 0) {
+      if (errorcode != DB_EXEC_SUCCESS_CODE) {
         return;
       }
 
-      LogInfoA("Select Ok");
+      auto pRecordVec = recordset->GetDBRecordVec();
+      if (pRecordVec == nullptr) {
+        return;
+      }
+
+      if (pRecordVec->size() == 0) {
+        return;
+      }
+
+      for (size_t i = 0; i < pRecordVec->size(); ++i) {
+        auto     pRecord   = (*pRecordVec)[i];
+        string   password  = (*pRecord->GetField("password"));
+        uint64_t accountid = (*pRecord->GetField("accountid"));
+        LogInfoA("AccountID={},Password={}", accountid, password);
+      }
     });
 
   bool busy      = false;

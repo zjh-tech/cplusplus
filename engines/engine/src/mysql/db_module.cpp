@@ -3,7 +3,7 @@
  * @Author: zhengjinhong
  * @Date: 2020-04-13 18:53:26
  * @LastEditors: zhengjinhong
- * @LastEditTime: 2021-01-07 11:51:02
+ * @LastEditTime: 2021-02-04 15:54:30
  */
 #include "engine/inc/mysql/db_module.h"
 #include "engine/inc/common/iocontextpool.h"
@@ -18,7 +18,8 @@ namespace DB {
 
   shared_ptr<MysqlModule> GMysqlModule = nullptr;
 
-  MysqlModule::MysqlModule() {
+  MysqlModule::MysqlModule()
+    : m_io_worker(m_io_context) {
   }
 
   MysqlModule::~MysqlModule() {

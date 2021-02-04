@@ -3,7 +3,7 @@
  * @Author: zhengjinhong
  * @Date: 2020-04-13 18:53:43
  * @LastEditors: zhengjinhong
- * @LastEditTime: 2021-01-07 14:42:53
+ * @LastEditTime: 2021-02-04 15:54:03
  */
 
 #pragma once
@@ -64,6 +64,7 @@ namespace DB {
     vector<MySQLConnPtr>      m_conn_vec;
     shared_ptr<IOContextPool> m_io_context_pool = nullptr;
     asio::io_context          m_io_context;
+    asio::io_context::work    m_io_worker;
   };
 
   extern shared_ptr<MysqlModule> GMysqlModule;

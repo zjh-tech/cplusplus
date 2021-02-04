@@ -3,7 +3,7 @@
  * @Author: zhengjinhong
  * @Date: 2020-04-13 18:53:43
  * @LastEditors: zhengjinhong
- * @LastEditTime: 2020-11-24 10:52:46
+ * @LastEditTime: 2021-02-04 14:35:16
  */
 
 #pragma once
@@ -24,6 +24,9 @@ namespace DB {
   };
 
 #define MYSQL_ORDER_EXEC_ID 0
+
+#define DB_EXEC_SUCCESS_CODE 0
+#define DB_EXEC_FAIL_CODE 1
 
 }  // namespace DB
 }  // namespace Framework

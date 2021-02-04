@@ -3,6 +3,7 @@ engines/build_linux
 
 engines/thirds/mysql/lib/*
 engines/lib
+engines/bin/example/*
 
 
 code/build
