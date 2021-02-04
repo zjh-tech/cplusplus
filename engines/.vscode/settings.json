@@ -31,7 +31,9 @@
         "deque": "cpp",
         "xtr1common": "cpp",
         "ios": "cpp",
-        "xutility": "cpp"
+        "xutility": "cpp",
+        "string": "cpp",
+        "utility": "cpp"
     },
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
 }

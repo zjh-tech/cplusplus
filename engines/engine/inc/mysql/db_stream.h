@@ -3,7 +3,7 @@
  * @Author: zhengjinhong
  * @Date: 2020-04-14 14:35:01
  * @LastEditors: zhengjinhong
- * @LastEditTime: 2021-01-28 18:44:02
+ * @LastEditTime: 2021-02-04 10:12:40
  */
 
 #pragma once
@@ -41,15 +41,16 @@ namespace DB {
     }
 
     DBStream& operator<<(const char* value) {
-      size_t value_len = strlen(value);
-      ensure_capacity(value_len);
-      memcpy(&m_buff[m_wpos], value, value_len);
-      m_wpos += value_len;
+      string escape_string_str = escape_string(value);
+      ensure_capacity(escape_string_str.size());
+      memcpy(&m_buff[m_wpos], escape_string_str.c_str(), escape_string_str.size());
+      m_wpos += escape_string_str.size();
       return *this;
     }
 
   private:
-    void ensure_capacity(size_t len);
+    void   ensure_capacity(size_t len);
+    string escape_string(const string& from);
 
   private:
     char*  m_buff     = nullptr;
@@ -62,9 +63,13 @@ namespace DB {
 
   template <>
   inline DBStream& DBStream::operator<<(const string& value) {
-    ensure_capacity(value.size());
-    memcpy(&m_buff[m_wpos], value.c_str(), value.size());
-    m_wpos += value.size();
+    (*this) << value.c_str();
+    return *this;
+  }
+
+  template <>
+  inline DBStream& DBStream::operator<<(string& value) {
+    (*this) << value.c_str();
     return *this;
   }
 

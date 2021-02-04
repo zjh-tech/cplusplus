@@ -71,47 +71,7 @@ namespace DB {
   string MySQLConn::EscapeString(const string& from) {
     string to;
     to.resize(from.size() * 2 + 1);
-    size_t index = 0;
-    //method 1 :
-    index = mysql_real_escape_string(m_pConnection, to.data(), from.c_str(), from.size());
-    //method 2 :
-    // size_t      from_len  = from.size();
-    // const char* from_data = from.c_str();
-    // for (size_t i = 0; i < from_len; ++i) {
-    //   char c = from_data[i];
-    //   switch (c) {
-    //     case '\0':
-    //       to[index++] = '\\';
-    //       to[index++] = '0';
-    //       break;
-    //     case '\n':
-    //       to[index++] = '\\';
-    //       to[index++] = 'n';
-    //       break;
-    //     case '\r':
-    //       to[index++] = '\\';
-    //       to[index++] = 'r';
-    //       break;
-    //     case 0x1a:
-    //       to[index++] = '\\';
-    //       to[index++] = 'Z';
-    //       break;
-    //     case '\'':
-    //       to[index++] = '\\';
-    //       to[index++] = '\'';
-    //       break;
-    //     case '"':
-    //       to[index++] = '\\';
-    //       to[index++] = '\"';
-    //       break;
-    //     case '\\':
-    //       to[index++] = '\\';
-    //       to[index++] = '\\';
-    //       break;
-    //     default:
-    //       to[index++] = c;
-    //   }
-    // }
+    size_t index = mysql_real_escape_string(m_pConnection, to.data(), from.c_str(), from.size());
     to.resize(index);
     return to;
   }
@@ -122,12 +82,10 @@ namespace DB {
       return record_set_ptr;
     }
 
-    string escape_string_sql = EscapeString(sql);
-
     //contain binary data must use mysql_real_query
-    int code = mysql_real_query(m_pConnection, escape_string_sql.c_str(), (unsigned long)escape_string_sql.size());
+    int code = mysql_real_query(m_pConnection, sql.c_str(), (unsigned long)sql.size());
     if (code != 0) {
-      LogErrorA("[db] mysql_real_query {} error {} {} ", escape_string_sql.c_str(), GetErrorCode(), GetErrorMsg());
+      LogErrorA("[db] mysql_real_query {} error {} {} ", sql.c_str(), GetErrorCode(), GetErrorMsg());
       return record_set_ptr;
     }
 
