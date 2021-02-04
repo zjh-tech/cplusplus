@@ -3,7 +3,7 @@
  * @Author: zhengjinhong
  * @Date: 2020-03-16 16:40:41
  * @LastEditors: zhengjinhong
- * @LastEditTime: 2021-02-04 11:00:02
+ * @LastEditTime: 2021-02-04 18:47:32
  */
 
 #pragma once
@@ -54,7 +54,11 @@ public:
   static string T2Str(T& t) {
     if constexpr (is_same_v<const char*, T>) {
       return t;
+    } else if constexpr (is_same_v<char*, T>) {
+      return t;
     } else if constexpr (is_same_v<string, T>) {
+      return t;
+    } else if constexpr (is_same_v<const string, T>) {
       return t;
     } else {
       stringstream ss;

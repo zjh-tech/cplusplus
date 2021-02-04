@@ -1,9 +1,0 @@
-/mnt/hgfs/ServerSet/engine/example/CSharp/CSharp/bin/release/netcoreapp2.1/centos.7-x64/CSharp.deps.json
-/mnt/hgfs/ServerSet/engine/example/CSharp/CSharp/bin/release/netcoreapp2.1/centos.7-x64/CSharp.dll
-/mnt/hgfs/ServerSet/engine/example/CSharp/CSharp/bin/release/netcoreapp2.1/centos.7-x64/CSharp.pdb
-/mnt/hgfs/ServerSet/engine/example/CSharp/CSharp/obj/release/netcoreapp2.1/centos.7-x64/CSharp.csprojAssemblyReference.cache
-/mnt/hgfs/ServerSet/engine/example/CSharp/CSharp/obj/release/netcoreapp2.1/centos.7-x64/CSharp.csproj.CoreCompileInputs.cache
-/mnt/hgfs/ServerSet/engine/example/CSharp/CSharp/obj/release/netcoreapp2.1/centos.7-x64/CSharp.AssemblyInfoInputs.cache
-/mnt/hgfs/ServerSet/engine/example/CSharp/CSharp/obj/release/netcoreapp2.1/centos.7-x64/CSharp.AssemblyInfo.cs
-/mnt/hgfs/ServerSet/engine/example/CSharp/CSharp/obj/release/netcoreapp2.1/centos.7-x64/CSharp.dll
-/mnt/hgfs/ServerSet/engine/example/CSharp/CSharp/obj/release/netcoreapp2.1/centos.7-x64/CSharp.pdb

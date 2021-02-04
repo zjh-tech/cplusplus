@@ -10,9 +10,9 @@
 
 int main(void) {
 #if defined(__linux__)
-  LOG_INIT("./log", "log_example", false, 1);
+  LOG_INIT("./log_log", "log_example", false, 1);
 #else
-  LOG_INIT("./log", "log_example", true, 1);
+  LOG_INIT("./log_log", "log_example", true, 1);
 #endif
 
   LogDebugA("debug name = {},id = {}", "zjh", 2);

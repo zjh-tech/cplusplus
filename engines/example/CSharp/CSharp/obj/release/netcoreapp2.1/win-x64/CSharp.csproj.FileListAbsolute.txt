@@ -1,9 +1,0 @@
-D:\ServerSet\engine\example\CSharp\CSharp\bin\Release\netcoreapp2.1\win-x64\CSharp.deps.json
-D:\ServerSet\engine\example\CSharp\CSharp\bin\Release\netcoreapp2.1\win-x64\CSharp.dll
-D:\ServerSet\engine\example\CSharp\CSharp\bin\Release\netcoreapp2.1\win-x64\CSharp.pdb
-D:\ServerSet\engine\example\CSharp\CSharp\obj\Release\netcoreapp2.1\win-x64\CSharp.csproj.CoreCompileInputs.cache
-D:\ServerSet\engine\example\CSharp\CSharp\obj\Release\netcoreapp2.1\win-x64\CSharp.AssemblyInfoInputs.cache
-D:\ServerSet\engine\example\CSharp\CSharp\obj\Release\netcoreapp2.1\win-x64\CSharp.AssemblyInfo.cs
-D:\ServerSet\engine\example\CSharp\CSharp\obj\Release\netcoreapp2.1\win-x64\CSharp.dll
-D:\ServerSet\engine\example\CSharp\CSharp\obj\Release\netcoreapp2.1\win-x64\CSharp.pdb
-D:\ServerSet\engine\example\CSharp\CSharp\obj\Release\netcoreapp2.1\win-x64\CSharp.csprojAssemblyReference.cache

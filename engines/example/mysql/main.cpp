@@ -2,7 +2,7 @@
  * @Author: zhengjinhong
  * @Date: 2019-11-11 10:44:56
  * @LastEditors: zhengjinhong
- * @LastEditTime: 2021-02-04 15:45:18
+ * @LastEditTime: 2021-02-04 18:35:59
  * @Description: file content
  */
 
@@ -27,9 +27,9 @@ using namespace std;
 
 int main(void) {
 #if defined(__linux__)
-  LOG_INIT("./log", "mysql_example", false, 1);
+  LOG_INIT("./mysql_log", "mysql_example", false, 1);
 #else
-  LOG_INIT("./log", "mysql_example", true, 1);
+  LOG_INIT("./mysql_log", "mysql_example", true, 1);
 #endif
 
   DB_INIT()
