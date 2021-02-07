@@ -2,7 +2,7 @@
  * @Author: zhengjinhong
  * @Date: 2019-11-11 10:44:56
  * @LastEditors: zhengjinhong
- * @LastEditTime: 2021-02-04 18:35:59
+ * @LastEditTime: 2021-02-05 14:53:09
  * @Description: file content
  */
 
@@ -111,9 +111,16 @@ int main(void) {
       }
 
       for (size_t i = 0; i < pRecordVec->size(); ++i) {
-        auto     pRecord   = (*pRecordVec)[i];
-        string   password  = (*pRecord->GetField("password"));
-        uint64_t accountid = (*pRecord->GetField("accountid"));
+        auto pRecord         = (*pRecordVec)[i];
+        auto pPasswordFiled  = pRecord->GetField("password");
+        auto pAccountIdFiled = pRecord->GetField("accountid");
+        if (pPasswordFiled == nullptr || pAccountIdFiled == nullptr) {
+          return;
+        }
+
+        string   password  = *pPasswordFiled;
+        uint64_t accountid = *pAccountIdFiled;
+
         LogInfoA("AccountID={},Password={}", accountid, password);
       }
     });
