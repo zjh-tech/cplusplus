@@ -3,7 +3,7 @@
  * @Author: zhengjinhong
  * @Date: 2020-04-15 20:00:18
  * @LastEditors: zhengjinhong
- * @LastEditTime: 2021-02-04 18:38:56
+ * @LastEditTime: 2021-02-07 17:45:11
  */
 
 #include "calcdelay.h"
@@ -76,7 +76,7 @@ public:
       eTimerID::EVERY_SOME_MONTH_CLOCK, month_timestamp, [this]() {
         timer_month();
 
-        struct tm tm_cur = {0};
+        struct tm tm_cur;
         Utils::TimeStamp2Tm(Utils::GetSecTime(), tm_cur);
         tuple<bool, uint64_t> temp_tuple = Utils::GetTotalDayCount(tm_cur.tm_mon, tm_cur.tm_year);
         if (get<0>(temp_tuple) == false) {

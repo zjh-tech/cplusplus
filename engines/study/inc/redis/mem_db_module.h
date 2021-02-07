@@ -24,15 +24,15 @@ class ProcessorPool;
 namespace Framework {
 namespace MemDB {
 
-  class CMemDBConn;
-  using MemDBConnPtr = std::shared_ptr<CMemDBConn>;
+  class RedisConn;
+  using RedisConnPtr = std::shared_ptr<RedisConn>;
 
-  class CMemDBModule : public std::enable_shared_from_this<CMemDBModule> {
+  class RedisModule : public std::enable_shared_from_this<RedisModule> {
     using ProcessorPoolPtr = std::shared_ptr<ProcessorPool>;
 
   public:
-    CMemDBModule(SMemDBConnInfo conn_info, uint32_t conn_count);
-    virtual ~CMemDBModule();
+    RedisModule(RedisConnSpec conn_info, uint32_t conn_count);
+    virtual ~RedisModule();
 
   public:
     //sync method
@@ -178,12 +178,12 @@ namespace MemDB {
     }
 
   private:
-    MemDBConnPtr choose_connection(int64_t uid);
+    RedisConnPtr choose_connection(int64_t uid);
 
   private:
-    SMemDBConnInfo            m_conn_info;
+    RedisConnSpec             m_conn_info;
     uint32_t                  m_conn_count;
-    std::vector<MemDBConnPtr> m_conn_vec;
+    std::vector<RedisConnPtr> m_conn_vec;
     ProcessorPoolPtr          m_processor_pool = nullptr;
   };  // namespace MemDB
 

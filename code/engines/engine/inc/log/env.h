@@ -3,12 +3,12 @@
  * @Author: zhengjinhong
  * @Date: 2020-12-18 10:32:15
  * @LastEditors: zhengjinhong
- * @LastEditTime: 2020-12-18 15:14:53
+ * @LastEditTime: 2021-02-07 17:18:32
  */
 
 #pragma once
 
-#include "engine/inc/log/logdef.h"
+#include "engine/inc/log/logdefine.h"
 #include "engine/inc/log/logger.h"
 
 using namespace Framework;

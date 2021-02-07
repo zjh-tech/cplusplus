@@ -8,9 +8,7 @@
 
 #include "engine/inc/common/iocontextpool.h"
 #include "engine/inc/log/env.h"
-#include "engine/inc/mysql/db_field.h"
 #include "engine/inc/mysql/env.h"
-#include "engine/inc/mysql/sql_tool.h"
 #include <tuple>
 
 #define DB_LOOP_COUNT 100
@@ -53,7 +51,7 @@ int main(void) {
 
   GMysqlModule->AsyncExecCommand(
     1,
-    [](shared_ptr<IMysqlConn> conn) -> tuple<int32_t, string, shared_ptr<IMysqlRecordSet>> {
+    [](shared_ptr<IDBConn> conn) -> tuple<int32_t, string, shared_ptr<IDBRecordSet>> {
       DBFieldPair insert_pair;
       string      username = "'zjh";
       string      password = "123456";
@@ -62,14 +60,14 @@ int main(void) {
 
       string insert_sql = SQLTool::GetInsertSQL("ACCOUNT", &insert_pair);
 
-      shared_ptr<IMysqlRecordSet> recordset = conn->ExecuteSql(insert_sql);
+      shared_ptr<IDBRecordSet> recordset = conn->ExecuteSql(insert_sql);
       if (recordset == nullptr) {
         return make_tuple(DB_EXEC_FAIL_CODE, "Insert Fail", recordset);
       } else {
         return make_tuple(DB_EXEC_SUCCESS_CODE, "", recordset);
       }
     },
-    [](int32_t errorcode, string errormsg, shared_ptr<IMysqlRecordSet> recordset) {
+    [](int32_t errorcode, string errormsg, shared_ptr<IDBRecordSet> recordset) {
       if (errorcode != DB_EXEC_SUCCESS_CODE) {
         return;
       }
@@ -79,7 +77,7 @@ int main(void) {
 
   GMysqlModule->AsyncExecCommand(
     1,
-    [](shared_ptr<IMysqlConn> conn) -> tuple<int32_t, string, shared_ptr<IMysqlRecordSet>> {
+    [](shared_ptr<IDBConn> conn) -> tuple<int32_t, string, shared_ptr<IDBRecordSet>> {
       DBField select_key;
       select_key.AddField("accountid");
       select_key.AddField("password");
@@ -89,14 +87,14 @@ int main(void) {
       where_pair.AddField("username", username);
 
       string                      select_sql = SQLTool::GetSelectSQL("ACCOUNT", &select_key, &where_pair);
-      shared_ptr<IMysqlRecordSet> recordset  = conn->ExecuteSql(select_sql);
+      shared_ptr<IDBRecordSet> recordset  = conn->ExecuteSql(select_sql);
       if (recordset == nullptr) {
         return make_tuple(DB_EXEC_FAIL_CODE, "Select Fail", recordset);
       } else {
         return make_tuple(DB_EXEC_SUCCESS_CODE, "", recordset);
       }
     },
-    [](int32_t errorcode, string errormsg, shared_ptr<IMysqlRecordSet> recordset) {
+    [](int32_t errorcode, string errormsg, shared_ptr<IDBRecordSet> recordset) {
       if (errorcode != DB_EXEC_SUCCESS_CODE) {
         return;
       }

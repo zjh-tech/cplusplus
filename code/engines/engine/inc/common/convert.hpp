@@ -3,7 +3,7 @@
  * @Author: zhengjinhong
  * @Date: 2020-03-16 16:40:41
  * @LastEditors: zhengjinhong
- * @LastEditTime: 2020-11-25 11:40:16
+ * @LastEditTime: 2021-02-04 18:47:32
  */
 
 #pragma once
@@ -41,11 +41,6 @@ public:
     }
   }
 
-  template <typename T>
-  static string Str2T(T& t) {
-    return to_string(t);
-  }
-
   //-------------safe third party use not crash-----
   template <typename T>
   static T SafeStr2T(const char* in) {
@@ -56,8 +51,20 @@ public:
   }
 
   template <typename T>
-  static string SafeStr2T(T& t) {
-    return to_string(t);
+  static string T2Str(T& t) {
+    if constexpr (is_same_v<const char*, T>) {
+      return t;
+    } else if constexpr (is_same_v<char*, T>) {
+      return t;
+    } else if constexpr (is_same_v<string, T>) {
+      return t;
+    } else if constexpr (is_same_v<const string, T>) {
+      return t;
+    } else {
+      stringstream ss;
+      ss << t;
+      return ss.str();
+    }
   }
 };
 
@@ -75,4 +82,5 @@ inline bool Convert::SafeStr2T(const char* in) {
 
   return (s == "0") ? false : true;
 }
+
 }  // namespace Framework

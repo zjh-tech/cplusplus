@@ -14,7 +14,7 @@ using namespace Framework;
 namespace Framework {
 namespace MemDB {
 
-  CMemDBModule::CMemDBModule(SMemDBConnInfo conn_info, uint32_t conn_count)
+  RedisModule::RedisModule(RedisConnSpec conn_info, uint32_t conn_count)
     : m_conn_info(conn_info)
     , m_conn_count(conn_count) {
     m_processor_pool = std::make_shared<ProcessorPool>();
@@ -26,7 +26,7 @@ namespace MemDB {
     m_processor_pool->start(m_conn_count);
 
     for (uint32_t i = 0; i < conn_count; ++i) {
-      MemDBConnPtr conn_ptr = std::make_shared<CMemDBConn>(m_conn_info, m_processor_pool->get_processor()->get_io_context());
+      RedisConnPtr conn_ptr = std::make_shared<RedisConn>(m_conn_info, m_processor_pool->get_processor()->get_io_context());
       assert(conn_ptr);
       if (!conn_ptr->connect()) {
         assert(false);
@@ -37,12 +37,12 @@ namespace MemDB {
     }
   }
 
-  CMemDBModule::~CMemDBModule() {
+  RedisModule::~RedisModule() {
     m_conn_vec.clear();
     m_processor_pool = nullptr;
   }
 
-  MemDBConnPtr CMemDBModule::choose_connection(int64_t uid) {
+  RedisConnPtr RedisModule::choose_connection(int64_t uid) {
     return m_conn_vec.size() == 0 ? nullptr : m_conn_vec[uid % m_conn_vec.size()];
   }
 

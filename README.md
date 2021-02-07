@@ -3,7 +3,7 @@
  * @Author: zhengjinhong
  * @Date: 2021-02-07 11:01:19
  * @LastEditors: zhengjinhong
- * @LastEditTime: 2021-02-07 12:05:00
+ * @LastEditTime: 2021-02-07 14:01:52
  -->
 
 cplusplus 库和框架
@@ -42,10 +42,7 @@ mysql:
     自动拼接Sql语句工具
     liquibase:分库分表sql的管理
     DBRecordSet返回的VarType支持基础类型的转换
-计划:    
-redis: 
-    hiredis待封装
-    C++与Lua: sol2
+
 
 框架:
     httpclient
@@ -71,3 +68,10 @@ redis:
 
 工具:
         打表工具: excel转protobuf 自动化代码生成,支持热更
+
+计划:    
+redis: 
+    hiredis
+    C++与Lua: sol2
+    组件QPS测试
+    微服务

@@ -14,20 +14,20 @@ using namespace Framework;
 namespace Framework {
 namespace MemDB {
 
-  CMemDBConn::CMemDBConn(SMemDBConnInfo conn_info, asio::io_context& io_context)
+  RedisConn::RedisConn(RedisConnSpec conn_info, asio::io_context& io_context)
     : m_conn_info(conn_info)
     , m_io_context(io_context) {
     m_errstr = new char[REDIS_REPLY_MAX_ERR_STR_LEN + 1];
   }
 
-  CMemDBConn::~CMemDBConn() {
+  RedisConn::~RedisConn() {
     if (m_errstr) {
       delete m_errstr;
       m_errstr = nullptr;
     }
   }
 
-  bool CMemDBConn::connect() {
+  bool RedisConn::connect() {
     struct timeval timeout = {1, 500000};  //1.5 seconds
     m_redis_context        = redisConnectWithTimeout(m_conn_info.host.c_str(), m_conn_info.port, timeout);
 
@@ -53,15 +53,15 @@ namespace MemDB {
     return true;
   }
 
-  void CMemDBConn::disconnect() {
+  void RedisConn::disconnect() {
     FREE_REDIS_CONTEXT();
   }
 
-  bool CMemDBConn::is_valid_handle() {
+  bool RedisConn::is_valid_handle() {
     return m_redis_context ? true : false;
   }
 
-  bool CMemDBConn::auth(std::string& password) {
+  bool RedisConn::auth(std::string& password) {
     if (password == "") {
       return false;
     }
@@ -77,19 +77,19 @@ namespace MemDB {
     return false;
   }
 
-  void CMemDBConn::begin_transaction() {
+  void RedisConn::begin_transaction() {
     exec("MULTI");
   }
 
-  void CMemDBConn::commit_transaction() {
+  void RedisConn::commit_transaction() {
     exec("EXEC");
   }
 
-  void CMemDBConn::rollback_transaction() {
+  void RedisConn::rollback_transaction() {
     exec("DISCARD");
   }
 
-  void CMemDBConn::SetErrInfo(const char* info) {
+  void RedisConn::SetErrInfo(const char* info) {
     if (m_errstr) {
       memset(m_errstr, 0, REDIS_REPLY_MAX_ERR_STR_LEN);
       strncpy(m_errstr, info, REDIS_REPLY_MAX_ERR_STR_LEN);

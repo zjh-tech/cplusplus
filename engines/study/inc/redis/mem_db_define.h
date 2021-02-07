@@ -12,7 +12,7 @@
 namespace Framework {
 namespace MemDB {
 
-  struct SMemDBConnInfo {
+  struct RedisConnSpec {
     std::string host     = "";
     uint16_t    port     = 0;
     std::string password = "";

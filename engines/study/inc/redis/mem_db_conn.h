@@ -39,10 +39,10 @@ using namespace std;
 namespace Framework {
 namespace MemDB {
 
-  class CMemDBConn : public std::enable_shared_from_this<CMemDBConn> {
+  class RedisConn : public std::enable_shared_from_this<RedisConn> {
   public:
-    CMemDBConn(SMemDBConnInfo conn_info, asio::io_context& io_context);
-    virtual ~CMemDBConn();
+    RedisConn(RedisConnSpec conn_info, asio::io_context& io_context);
+    virtual ~RedisConn();
 
   public:
     bool connect();
@@ -241,7 +241,7 @@ namespace MemDB {
     bool auth(std::string& password);
 
   private:
-    SMemDBConnInfo    m_conn_info;
+    RedisConnSpec    m_conn_info;
     asio::io_context& m_io_context;
 
     redisContext* m_redis_context = nullptr;

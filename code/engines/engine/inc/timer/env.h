@@ -3,15 +3,14 @@
  * @Author: zhengjinhong
  * @Date: 2020-04-16 17:01:44
  * @LastEditors: zhengjinhong
- * @LastEditTime: 2021-01-07 12:04:29
+ * @LastEditTime: 2021-02-07 17:22:03
  */
 
 #pragma once
 
 #include "engine/inc/common/marco.hpp"
-#include "engine/inc/timer/itimer.h"
 #include "engine/inc/timer/timer.h"
-#include "engine/inc/timer/timer_register.h"
+#include "engine/inc/timer/timerregister.h"
 #include "engine/inc/timer/timewheel.h"
 
 using namespace Framework;
