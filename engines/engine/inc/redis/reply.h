@@ -3,7 +3,7 @@
  * @Author: zhengjinhong
  * @Date: 2021-02-18 11:37:20
  * @LastEditors: zhengjinhong
- * @LastEditTime: 2021-02-19 12:02:37
+ * @LastEditTime: 2021-02-23 16:58:06
  */
 
 #pragma once
@@ -46,7 +46,7 @@ namespace MemDB {
       return reply.type == REDIS_REPLY_INTEGER;
     }
 
-    inline bool IsArray(edisReply& reply) {
+    inline bool IsArray(redisReply& reply) {
       return reply.type == REDIS_REPLY_ARRAY;
     }
 
