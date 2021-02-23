@@ -2,7 +2,7 @@
  * @Author: zhengjinhong
  * @Date: 2019-11-11 10:44:56
  * @LastEditors: zhengjinhong
- * @LastEditTime: 2021-02-23 17:30:19
+ * @LastEditTime: 2021-02-23 18:47:26
  * @Description: file content
  */
 
@@ -21,19 +21,12 @@ int main(void) {
 
   uint32_t loop_num   = 1000000;
   int64_t  start_tick = GetMillTime();
-  int64_t  qps_count  = 0;
   for (uint32_t i = 0; i < loop_num; ++i) {
-    LogInfo("DebugA");
-    //LogInfo("info name = {},id = {}", "zjh", 3);
-
-    ++qps_count;
-    int64_t end_tick = GetMillTime();
-    if ((end_tick - start_tick) >= 1000) {
-      LogInfo("Sync Qps={}", qps_count);
-      qps_count  = 0;
-      start_tick = end_tick;
-    }
+    //LogInfo("This message is 116 characters long including the info that comes before it. {}", i);
+    LogInfo("");
   }
+  int64_t end_tick = GetMillTime();
+  LogInfo("Sync Qps={}", loop_num * 1000 / (end_tick - start_tick));
 
   bool busy = false;
   while (true) {

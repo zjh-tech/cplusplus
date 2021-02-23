@@ -2,7 +2,7 @@
  * @Author: zhengjinhong
  * @Date: 2019-08-19 11:27:24
  * @LastEditors: zhengjinhong
- * @LastEditTime: 2021-02-07 17:17:40
+ * @LastEditTime: 2021-02-23 18:53:44
  * @Description: logger
  */
 
@@ -45,6 +45,8 @@ namespace Log {
       string content = get_content(_fmt, _args...);
       log_mutex.lock();
       if (async_flag) {
+        // LogEvent event(_level, content);
+        // evt_vector.emplace_back(event);
         asio::post(io_context, [this, _level, content]() {
           out_put(_level, content, true);
         });
@@ -126,6 +128,10 @@ namespace Log {
     int64_t                flush_tick           = 0;
     int64_t                async_flush_max_tick = 100;
     bool                   stop_flag            = false;
+
+    //not use asio
+    // vector<LogEvent> evt_vector;
+    // vector<LogEvent> evt_two_vector;
   };
 }  // namespace Log
 };  // namespace Framework

@@ -2,7 +2,7 @@
  * @Author: zhengjinhong
  * @Date: 2019-11-08 16:12:31
  * @LastEditors: zhengjinhong
- * @LastEditTime: 2021-02-23 17:21:54
+ * @LastEditTime: 2021-02-23 18:36:47
  * @Description: file content
  */
 #include "engine/inc/log/logger.h"
@@ -156,17 +156,30 @@ namespace Log {
   }
 
   void Logger::run() {
-    bool busy = false;
+    bool     busy     = false;
+    uint32_t loop_num = 1000;
     while (is_running_flag) {
       busy = false;
       if (io_context.poll_one() != 0) {
         busy = true;
-        for (uint32_t i = 0; i < 1000; ++i) {
+        for (uint32_t i = 0; i < loop_num; ++i) {
           if (io_context.poll_one() == 0) {
             break;
           }
         }
       }
+
+      // log_mutex.lock();
+      // evt_two_vector = evt_vector;
+      // evt_vector.clear();
+      // log_mutex.unlock();
+
+      // size_t total_count = evt_two_vector.size();
+      // for (size_t i = 0; i < total_count; ++i) {
+      //   LogEvent& evt = evt_two_vector[i];
+      //   out_put(evt.level, evt.content, true);
+      // }
+      // evt_two_vector.clear();
 
       int64_t now = get_mill_time();
       if ((flush_tick + async_flush_max_tick) <= now && cur_ofstream_ptr) {
