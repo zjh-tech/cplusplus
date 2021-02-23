@@ -2,7 +2,7 @@
  * @Author: zhengjinhong
  * @Date: 2019-11-08 16:12:31
  * @LastEditors: zhengjinhong
- * @LastEditTime: 2021-01-26 10:49:59
+ * @LastEditTime: 2021-02-23 17:21:54
  * @Description: file content
  */
 #include "engine/inc/log/logger.h"
@@ -161,7 +161,7 @@ namespace Log {
       busy = false;
       if (io_context.poll_one() != 0) {
         busy = true;
-        for (uint32_t i = 0; i < 100; ++i) {
+        for (uint32_t i = 0; i < 1000; ++i) {
           if (io_context.poll_one() == 0) {
             break;
           }
