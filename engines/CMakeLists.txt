@@ -26,6 +26,7 @@ include_directories("${PROJECT_SOURCE_DIR}/")
 
 include_directories("${PROJECT_SOURCE_DIR}/thirds/asio/include")               # asio
 include_directories("${PROJECT_SOURCE_DIR}/thirds/mysql/include")              # mysql
+include_directories("${PROJECT_SOURCE_DIR}/thirds/hiredis")            # hiredis
 
 # link
 if(UNIX)
