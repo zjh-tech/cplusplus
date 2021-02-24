@@ -2,7 +2,7 @@
  * @Author: zhengjinhong
  * @Date: 2019-08-19 11:27:24
  * @LastEditors: zhengjinhong
- * @LastEditTime: 2021-02-23 18:53:44
+ * @LastEditTime: 2021-02-24 11:58:42
  * @Description: logger
  */
 
@@ -12,7 +12,7 @@
 #include <functional>
 #include <iostream>
 #include <memory>
-#include <mutex>
+//#include <mutex>
 #include <queue>
 #include <sstream>
 #include <stdio.h>
@@ -43,17 +43,16 @@ namespace Log {
       }
 
       string content = get_content(_fmt, _args...);
-      log_mutex.lock();
       if (async_flag) {
-        // LogEvent event(_level, content);
-        // evt_vector.emplace_back(event);
         asio::post(io_context, [this, _level, content]() {
           out_put(_level, content, true);
         });
+
+        // LogEvent event(_level, content);
+        // evt_vector.emplace_back(event);
       } else {
         out_put(_level, content, false);
       }
-      log_mutex.unlock();
     }
 
   private:
@@ -119,6 +118,7 @@ namespace Log {
     bool                   console_flag = false;
     eLogLevel              level        = eLogLevel::INFO_LEVEL;
     mutex                  log_mutex;
+    atomic<bool>           write_flag = false;
     thread                 log_thread;
     asio::io_context       io_context;
     asio::io_context::work io_worker;
@@ -130,6 +130,16 @@ namespace Log {
     bool                   stop_flag            = false;
 
     //not use asio
+    // struct LogEvent {
+    //   LogEvent(eLogLevel _level, string _content)
+    //     : level(_level)
+    //     , content(_content) {
+    //   }
+
+    //   eLogLevel level;
+    //   string    content;
+    // };
+
     // vector<LogEvent> evt_vector;
     // vector<LogEvent> evt_two_vector;
   };

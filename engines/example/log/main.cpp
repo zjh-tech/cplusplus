@@ -2,7 +2,7 @@
  * @Author: zhengjinhong
  * @Date: 2019-11-11 10:44:56
  * @LastEditors: zhengjinhong
- * @LastEditTime: 2021-02-23 18:47:26
+ * @LastEditTime: 2021-02-23 19:23:29
  * @Description: file content
  */
 
@@ -22,8 +22,8 @@ int main(void) {
   uint32_t loop_num   = 1000000;
   int64_t  start_tick = GetMillTime();
   for (uint32_t i = 0; i < loop_num; ++i) {
-    //LogInfo("This message is 116 characters long including the info that comes before it. {}", i);
-    LogInfo("");
+    LogInfo("This message is 116 characters long including the info that comes before it. {}", i);
+    //LogInfo("");
   }
   int64_t end_tick = GetMillTime();
   LogInfo("Sync Qps={}", loop_num * 1000 / (end_tick - start_tick));

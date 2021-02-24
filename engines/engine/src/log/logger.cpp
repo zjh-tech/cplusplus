@@ -2,7 +2,7 @@
  * @Author: zhengjinhong
  * @Date: 2019-11-08 16:12:31
  * @LastEditors: zhengjinhong
- * @LastEditTime: 2021-02-23 18:36:47
+ * @LastEditTime: 2021-02-24 12:06:05
  * @Description: file content
  */
 #include "engine/inc/log/logger.h"
@@ -73,6 +73,8 @@ namespace Log {
   }
 
   void Logger::out_put(eLogLevel level, const string& content, bool async_flag) {
+    lock_guard<mutex> lock_guard(log_mutex);
+
     int64_t   cur_mill = get_sec_time();
     struct tm tm_next;
     timestamp2tm(cur_mill, tm_next);
@@ -102,10 +104,9 @@ namespace Log {
       cur_ofstream_ptr->clear();
     }
 
-#if defined(__linux__)
-#else
-    cout << ss.str();
-#endif
+    if (console_flag) {
+      cout << ss.str();
+    }
   }
 
   bool Logger::check_diff_date(struct tm& tm_next) {
@@ -169,10 +170,11 @@ namespace Log {
         }
       }
 
-      // log_mutex.lock();
-      // evt_two_vector = evt_vector;
-      // evt_vector.clear();
-      // log_mutex.unlock();
+      // {
+      //   lock_guard<mutex> lock_guard(log_mutex);
+      //   evt_two_vector = evt_vector;
+      //   evt_vector.clear();
+      // }
 
       // size_t total_count = evt_two_vector.size();
       // for (size_t i = 0; i < total_count; ++i) {
@@ -184,10 +186,11 @@ namespace Log {
       int64_t now = get_mill_time();
       if ((flush_tick + async_flush_max_tick) <= now && cur_ofstream_ptr) {
         busy = true;
-        log_mutex.lock();
-        cur_ofstream_ptr->flush();
-        cur_ofstream_ptr->clear();
-        log_mutex.unlock();
+        {
+          lock_guard<mutex> lock_guard(log_mutex);
+          cur_ofstream_ptr->flush();
+          cur_ofstream_ptr->clear();
+        }
       }
 
       if (stop_flag) {
