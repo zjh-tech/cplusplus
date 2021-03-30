@@ -2,11 +2,8 @@
 
 #engines
 rm -rf engines/build 
-rm -rf engines/build_linux 
-rm -rf engines/lib/linux 
-rm -rf engines/lib/win
-rm -rf engines/bin/linux
-rm -rf engines/bin/win
+rm -rf engines/lib
+rm -rf engines/bin
 echo "clear engines ok..."
 
 

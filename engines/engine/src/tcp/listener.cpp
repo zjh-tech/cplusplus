@@ -1,87 +1,91 @@
-/*
- * @Descripttion: 
- * @Author: zhengjinhong
- * @Date: 2020-12-15 11:08:03
- * @LastEditors: zhengjinhong
- * @LastEditTime: 2020-12-24 15:14:40
- */
 
 #include "engine/inc/tcp/listener.h"
+
 #include "engine/inc/common/iocontextpool.h"
 #include "engine/inc/log/env.h"
 #include "engine/inc/tcp/connectionmgr.h"
 #include "engine/inc/tcp/event.h"
 #include "engine/inc/tcp/isession.h"
 #include "engine/inc/tcp/net.h"
+#include "engine/inc/tcp/netdefine.h"
 
-namespace Framework {
-namespace Tcp {
-
-  Listener::Listener(IOContextPoolPtr io_context_pool)
-    : m_acceptor(Net::Instance()->GetIoContext()) {
-    assert(io_context_pool);
-    m_io_context_pool = io_context_pool;
-  }
-
-  bool Listener::start(const string& host, uint32_t port, shared_ptr<ISessionFactory> session_factory, ListenCbFunc fail_cb) {
-    m_host            = host;
-    m_port            = port;
-    m_session_factory = session_factory;
-    m_fail_cb_func    = fail_cb;
-    LogInfoA("start listen {}  {}", m_host, m_port);
-
-    asio::ip::tcp::endpoint endpoint(asio::ip::make_address(host), port);
-    m_acceptor.open(endpoint.protocol());
-    if (m_acceptor.is_open()) {
-      m_acceptor.set_option(asio::socket_base::reuse_address(true));
-      m_acceptor.non_blocking(true);
-      //m_acceptor.set_option(asio::ip::tcp::no_delay(true));
-      //asio::socket_base::send_buffer_size SNDBUF(2048);
-      //asio::socket_base::receive_buffer_size RCVBUF(2048);
-      //m_acceptor.set_option(SNDBUF);
-      //m_acceptor.set_option(RCVBUF);
-      this->m_acceptor.bind(endpoint);
-      this->m_acceptor.listen();
-      this->do_accept();
-      return true;
-    }
-
-    return false;
-  }
-
-  void Listener::stop() {
-    LogInfoA("stop listen {}  {}", m_host, m_port);
-    m_acceptor.close();
-  }
-
-  void Listener::do_accept() {
-    auto& iocontext       = m_io_context_pool->GetNextIoContext();
-    auto  session_factory = m_session_factory.lock();
-    assert(session_factory);
-    if (session_factory == nullptr) {
-      LogErrorA("[Net] AsyncAccept Host={}  Port={} SessionFactory Is Null", m_host, m_port);
-      return;
-    }
-    auto session = session_factory->CreateSession();
-    assert(session);
-    shared_ptr<IConnection> conn = ConnectionMgr::Instance()->Create(iocontext, Net::Instance(), session);
-    assert(conn);
-    m_acceptor.async_accept(conn->GetSocket(), [this, conn, session](error_code ec) {
-      if (ec) {
-        LogErrorA("[Net] AsyncAccept Host={}  Port={} Error={}", m_host, m_port, ec.message());
-        if (this->m_fail_cb_func) {
-          this->m_fail_cb_func();
+namespace Framework
+{
+    namespace Tcp
+    {
+        Listener::Listener(IOContextPoolPtr io_context_pool) : acceptor_(Net::Instance()->GetIoContext())
+        {
+            assert(io_context_pool);
+            io_context_pool_ = io_context_pool;
         }
-        return;
-      }
 
-      auto eventPtr = make_shared<Event>(eEventType::ConnEstablish, conn, session);
-      Net::Instance()->PushEvent(eventPtr);
+        bool Listener::Start(const string& host, uint32_t port, shared_ptr<ISessionFactory> session_factory,
+                             ListenCbFunc fail_cb_func)
+        {
+            host_            = host;
+            port_            = port;
+            session_factory_ = session_factory;
+            fail_cb_func_    = fail_cb_func;
+            LogInfoA("start listen {}  {}", host_, port_);
 
-      conn->DoRead();
-      do_accept();
-    });
-  }
+            asio::ip::tcp::endpoint endpoint(asio::ip::make_address(host), port);
+            acceptor_.open(endpoint.protocol());
+            if (acceptor_.is_open())
+            {
+                acceptor_.set_option(asio::socket_base::reuse_address(true));
+                acceptor_.non_blocking(true);
+                acceptor_.set_option(asio::ip::tcp::no_delay(true));
+                asio::socket_base::send_buffer_size sendbuf(SEND_BUFF_SIZE);
+                asio::socket_base::receive_buffer_size recvbuf(RECV_BUFF_SIZE);
+                acceptor_.set_option(sendbuf);
+                acceptor_.set_option(recvbuf);
+                this->acceptor_.bind(endpoint);
+                this->acceptor_.listen();
+                this->do_accept();
+                return true;
+            }
 
-}  // namespace Tcp
+            return false;
+        }
+
+        void Listener::Stop()
+        {
+            LogInfoA("stop listen {}  {}", host_, port_);
+            acceptor_.close();
+        }
+
+        void Listener::do_accept()
+        {
+            auto& iocontext      = io_context_pool_->GetNextIoContext();
+            auto session_factory = session_factory_.lock();
+            assert(session_factory);
+            if (session_factory == nullptr)
+            {
+                LogErrorA("[Net] AsyncAccept Host={}  Port={} SessionFactory Is Null", host_, port_);
+                return;
+            }
+            auto session = session_factory->CreateSession();
+            assert(session);
+            shared_ptr<IConnection> conn = ConnectionMgr::Instance()->Create(iocontext, Net::Instance(), session);
+            assert(conn);
+            acceptor_.async_accept(conn->GetSocket(), [this, conn, session](error_code ec) {
+                if (ec)
+                {
+                    LogErrorA("[Net] AsyncAccept Host={}  Port={} Error={}", host_, port_, ec.message());
+                    if (this->fail_cb_func_)
+                    {
+                        this->fail_cb_func_();
+                    }
+                    return;
+                }
+
+                auto event_ptr = make_shared<Event>(eEventType::ConnEstablish, conn, session);
+                Net::Instance()->PushEvent(event_ptr);
+
+                conn->DoRead();
+                do_accept();
+            });
+        }
+
+    }  // namespace Tcp
 }  // namespace Framework

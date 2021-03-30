@@ -190,7 +190,7 @@ class CTool:
         code += tab_code + tab_code + "return CREATE_ERROR_STRING(\"load " + \
             fileName + "  file error..\"); " + change_line
         code += tab_code + "}" + change_line
-        code += tab_code + "LogInfo(\"[StaticDataMgr] " + cap_file_name + \
+        code += tab_code + "LogInfoA(\"[StaticDataMgr] " + cap_file_name + \
             "Cfg={}\"," + fileName + "_ptr->DebugString());" + change_line
         code += empty_line
 

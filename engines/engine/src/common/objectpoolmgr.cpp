@@ -1,43 +1,41 @@
-/*
- * @Descripttion: 
- * @Author: zhengjinhong
- * @Date: 2020-04-24 14:18:45
- * @LastEditors: zhengjinhong
- * @LastEditTime: 2021-02-07 17:24:42
- */
-
 #include "engine/inc/common/objectpoolmgr.h"
 
-namespace Framework {
+namespace Framework
+{
+    void ObjectPoolMgr::Gc()
+    {
+        LogInfoA("[ObjectPool] ObjectPool Start GC");
 
-void ObjectPoolMgr::Gc() {
-  LogInfoA("[ObjectPool] ObjectPool Start GC");
+        ENTER_LOCK();
+        for (auto iter = object_pool_map_.begin(); iter != object_pool_map_.end(); ++iter)
+        {
+            if (iter->second)
+            {
+                iter->second->Gc();
+            }
+        }
+        LEAVE_LOCK();
 
-  ENTER_LOCK();
-  for (auto iter = m_object_pool_map.begin(); iter != m_object_pool_map.end(); ++iter) {
-    if (iter->second) {
-      iter->second->Gc();
+        LogInfoA("[ObjectPool] ObjectPool End GC");
     }
-  }
-  LEAVE_LOCK();
 
-  LogInfoA("[ObjectPool] ObjectPool End GC");
-}
+    void ObjectPoolMgr::Monitor()
+    {
+        LogInfoA("[ObjectPool] ObjectPool Start Monitor Memory");
 
-void ObjectPoolMgr::Monitor() {
-  LogInfoA("[ObjectPool] ObjectPool Start Monitor Memory");
+        ENTER_LOCK();
+        for (auto iter = object_pool_map_.begin(); iter != object_pool_map_.end(); ++iter)
+        {
+            if (iter->second)
+            {
+                iter->second->Monitor();
+            }
+        }
+        LEAVE_LOCK();
 
-  ENTER_LOCK();
-  for (auto iter = m_object_pool_map.begin(); iter != m_object_pool_map.end(); ++iter) {
-    if (iter->second) {
-      iter->second->Monitor();
+        LogInfoA("[ObjectPool] ObjectPool End Monitor Memory");
     }
-  }
-  LEAVE_LOCK();
 
-  LogInfoA("[ObjectPool] ObjectPool End Monitor Memory");
-}
-
-shared_ptr<ObjectPoolMgr> GObjectPoolMgr = nullptr;
+    shared_ptr<ObjectPoolMgr> GObjectPoolMgr = nullptr;
 
 }  // namespace Framework

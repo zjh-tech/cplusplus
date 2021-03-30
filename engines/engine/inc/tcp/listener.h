@@ -1,49 +1,47 @@
-/*
- * @Author: zhengjinhong
- * @Date: 2019-11-12 13:56:34
- * @LastEditors: zhengjinhong
- * @LastEditTime: 2020-12-24 14:59:35
- * @Description: file content
- */
-
 #pragma once
 #include <asio.hpp>
 #include <memory>
 
-namespace Framework {
-class IOContextPool;
+namespace Framework
+{
+    class IOContextPool;
 }  // namespace Framework
 
 using namespace Framework;
 using namespace std;
 
-namespace Framework {
-namespace Tcp {
+namespace Framework
+{
+    namespace Tcp
+    {
+        class ISessionFactory;
 
-  class ISessionFactory;
+        typedef void (*ListenCbFunc)();
 
-  typedef void (*ListenCbFunc)();
+        class Listener
+        {
+            using IOContextPoolPtr = shared_ptr<IOContextPool>;
 
-  class Listener {
-    using IOContextPoolPtr = shared_ptr<IOContextPool>;
+        public:
+            Listener(IOContextPoolPtr io_context_pool);
+            virtual ~Listener()
+            {
+            }
 
-  public:
-    Listener(IOContextPoolPtr io_context_pool);
-    virtual ~Listener() {}
+            bool Start(const string& host, uint32_t port, shared_ptr<ISessionFactory> session_factory,
+                       ListenCbFunc fail_cb_func = nullptr);
+            void Stop();
 
-    bool start(const string& host, uint32_t port, shared_ptr<ISessionFactory> session_factory, ListenCbFunc fail_cb = nullptr);
-    void stop();
+        private:
+            void do_accept();
 
-  private:
-    void do_accept();
+            string host_;
+            int32_t port_ = 0;
+            asio::ip::tcp::acceptor acceptor_;
+            IOContextPoolPtr io_context_pool_ = nullptr;
+            weak_ptr<ISessionFactory> session_factory_;
+            ListenCbFunc fail_cb_func_ = nullptr;
+        };
 
-    string                    m_host;
-    int32_t                   m_port = 0;
-    asio::ip::tcp::acceptor   m_acceptor;
-    IOContextPoolPtr          m_io_context_pool = nullptr;
-    weak_ptr<ISessionFactory> m_session_factory;
-    ListenCbFunc              m_fail_cb_func = nullptr;
-  };
-
-}  // namespace Tcp
+    }  // namespace Tcp
 }  // namespace Framework

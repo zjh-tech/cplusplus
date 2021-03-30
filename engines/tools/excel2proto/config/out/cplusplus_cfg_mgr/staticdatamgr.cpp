@@ -35,7 +35,7 @@ ErrorStringPtr StaticDataMgr::LoadAllCfg(const char *path)
    {
       return CREATE_ERROR_STRING("load tip  file error.."); 
    }
-   LogInfo("[StaticDataMgr] TipCfg={}",tip_ptr->DebugString());
+   LogInfoA("[StaticDataMgr] TipCfg={}",tip_ptr->DebugString());
                      
    return nullptr;
 }

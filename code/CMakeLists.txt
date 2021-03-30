@@ -8,16 +8,10 @@ project(engine)
 # version
 
 # platform
-if(UNIX)
-    include(engines/cmake/linux.cmake)  
-    include(${PROJECT_SOURCE_DIR}/engines/thirds/mysql/cmake/findmysql.cmake)  
-    #set(MYSQL_LIBRARIES "${PROJECT_SOURCE_DIR}/engines/thirds/mysql/lib/libmysqld.a")
-    #set(MYSQL_LIBRARIES "${PROJECT_SOURCE_DIR}/engines/thirds/mysql/lib/libmysqlclient.so.20.3.18")
-else()
-    include(engines/cmake/windows.cmake)
-    #include(${PROJECT_SOURCE_DIR}/engines/thirds/mysql/cmake/findmysql.cmake)
-    set(MYSQL_LIBRARIES "${PROJECT_SOURCE_DIR}/engines/thirds/mysql/lib/libmysql.lib")    
-endif()
+include(engines/cmake/linux.cmake)  
+include(${PROJECT_SOURCE_DIR}/engines/thirds/mysql/cmake/findmysql.cmake)  
+#set(MYSQL_LIBRARIES "${PROJECT_SOURCE_DIR}/engines/thirds/mysql/lib/libmysqld.a")
+#set(MYSQL_LIBRARIES "${PROJECT_SOURCE_DIR}/engines/thirds/mysql/lib/libmysqlclient.so.20.3.18")
 
 # find protobuf
 #find_package(Protobuf REQUIRED)
@@ -51,18 +45,13 @@ include_directories("${PROJECT_SOURCE_DIR}/projects/thirds/curl/include")       
 include_directories("${PROJECT_SOURCE_DIR}/projects/staticdata")                     # staticdata
 
 #link
-if(UNIX)
-     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-        link_directories("${PROJECT_SOURCE_DIR}/engines/lib/linux/Debug")
-        link_directories("${PROJECT_SOURCE_DIR}/projects/lib/linux/Debug")
-    else()
-        link_directories("${PROJECT_SOURCE_DIR}/engines/lib/linux/Release")        
-        link_directories("${PROJECT_SOURCE_DIR}/projects/lib/linux/Release")
-    endif()    
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    link_directories("${PROJECT_SOURCE_DIR}/engines/lib/Debug")
+    link_directories("${PROJECT_SOURCE_DIR}/projects/lib/Debug")
 else()
-    link_directories("${PROJECT_SOURCE_DIR}/engines/lib/win")
-    link_directories("${PROJECT_SOURCE_DIR}/projects/lib/win")
-endif()
+    link_directories("${PROJECT_SOURCE_DIR}/engines/lib/Release")        
+    link_directories("${PROJECT_SOURCE_DIR}/projects/lib/Release")
+endif()    
 
 #sub
 add_subdirectory(projects)

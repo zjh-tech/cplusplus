@@ -1,45 +1,44 @@
-/*
- * @Descripttion: 
- * @Author: zhengjinhong
- * @Date: 2019-12-02 21:40:18
- * @LastEditors: zhengjinhong
- * @LastEditTime: 2020-11-25 12:12:38
- */
 #pragma once
 
-#include "engine/inc/common/noncopyable.hpp"
 #include <mutex>
 
-namespace Framework {
+#include "engine/inc/common/noncopyable.hpp"
 
-template <typename T>
-class Singleton : Noncopyable {
-public:
-  static T* Instance() {
-    if (m_ptr) {
-      return m_ptr;
-    }
+namespace Framework
+{
+    template <typename T>
+    class Singleton : Noncopyable
+    {
+    public:
+        static T* Instance()
+        {
+            if (ptr_)
+            {
+                return ptr_;
+            }
 
-    std::call_once(m_once_flag, [&]() { m_ptr = new T(); });
-    return m_ptr;
-  }
+            std::call_once(once_flag_, [&]() { ptr_ = new T(); });
+            return ptr_;
+        }
 
-  static void Destroy() {
-    if (m_ptr) {
-      delete m_ptr;
-      m_ptr = nullptr;
-    }
-  }
+        static void Destroy()
+        {
+            if (ptr_)
+            {
+                delete ptr_;
+                ptr_ = nullptr;
+            }
+        }
 
-private:
-  static std::once_flag m_once_flag;
-  static T*             m_ptr;
-};
+    private:
+        static std::once_flag once_flag_;
+        static T* ptr_;
+    };
 
-template <typename T>
-std::once_flag Singleton<T>::m_once_flag;
+    template <typename T>
+    std::once_flag Singleton<T>::once_flag_;
 
-template <typename T>
-T* Singleton<T>::m_ptr = nullptr;
+    template <typename T>
+    T* Singleton<T>::ptr_ = nullptr;
 
 }  // namespace Framework

@@ -1,12 +1,5 @@
-/*
- * @Author: zhengjinhong
- * @Date: 2019-11-12 16:33:34
- * @LastEditors: zhengjinhong
- * @LastEditTime: 2021-01-07 11:57:59
- * @Description: file content
- */
-
 #include "engine/inc/tcp/net.h"
+
 #include "engine/inc/log/env.h"
 #include "engine/inc/tcp/connectionmgr.h"
 #include "engine/inc/tcp/event.h"
@@ -14,85 +7,107 @@
 #include "engine/inc/tcp/ievent.h"
 #include "engine/inc/tcp/isession.h"
 
-namespace Framework {
-namespace Tcp {
-  Net::Net()
-    : m_io_worker(m_io_context) {
-  }
+namespace Framework
+{
+    namespace Tcp
+    {
+        Net::Net() : io_worker_(io_context_)
+        {
+        }
 
-  void Net::PushEvent(shared_ptr<IEvent> event) {
-    asio::post(m_io_context, [event]() {
-      if (event == nullptr) {
-        return;
-      }
+        void Net::PushEvent(shared_ptr<IEvent> event)
+        {
+            asio::post(io_context_, [event]() {
+                if (event == nullptr)
+                {
+                    return;
+                }
 
-      shared_ptr<IConnection> connPtr = event->GetConnPtr();
-      assert(connPtr);
+                shared_ptr<IConnection> conn_ptr = event->GetConnPtr();
+                assert(conn_ptr);
 
-      shared_ptr<ISession> sessionPtr = event->GetSessPtr();
-      assert(sessionPtr);
+                shared_ptr<ISession> session_ptr = event->GetSessPtr();
+                assert(session_ptr);
 
-      if (event->GetType() == eEventType::ConnEstablish) {
-        sessionPtr->SetConnectionPtr(connPtr);
-        sessionPtr->OnEstablish();
-      } else if (event->GetType() == eEventType::RecvMsg) {
-        string& datas = event->GetDatas();
-        sessionPtr->ProcessMsg(datas.data(), datas.size());
-      } else if (event->GetType() == eEventType::ConnTerminate) {
-        ConnectionMgr::Instance()->Remove(connPtr->GetConnID());
-        sessionPtr->OnTerminate();
-        sessionPtr->SetConnectionPtr(nullptr);
-      } else {
-        LogWarnA("[Net] PushEvent EventType={}", (uint32_t)event->GetType());
-      }
-    });
-  }
+                if (event->GetType() == eEventType::ConnEstablish)
+                {
+                    session_ptr->SetConnectionPtr(conn_ptr);
+                    session_ptr->OnEstablish();
+                }
+                else if (event->GetType() == eEventType::RecvMsg)
+                {
+                    string& datas = event->GetDatas();
+                    session_ptr->ProcessMsg(datas.data(), datas.size());
+                }
+                else if (event->GetType() == eEventType::ConnTerminate)
+                {
+                    ConnectionMgr::Instance()->Remove(conn_ptr->GetConnID());
+                    session_ptr->OnTerminate();
+                    session_ptr->SetConnectionPtr(nullptr);
+                }
+                else
+                {
+                    LogWarnA("[Net] PushEvent EventType={}", (uint32_t)event->GetType());
+                }
+            });
+        }
 
-  void Net::DoConnect(asio::io_context& io_context, const string& host, uint32_t port, shared_ptr<ISession> session_ptr) {
-    LogInfoA("[Net] DoConnect Host={}  Port={} ", host, port);
+        void Net::DoConnect(asio::io_context& io_context, const string& host, uint32_t port,
+                            shared_ptr<ISession> session_ptr)
+        {
+            LogInfoA("[Net] DoConnect Host={}  Port={} ", host, port);
 
-    assert(session_ptr);
-    auto connPtr = ConnectionMgr::Instance()->Create(io_context, this, session_ptr);
-    assert(connPtr);
-    connPtr->SetSessionPtr(session_ptr);
+            assert(session_ptr);
+            auto conn_ptr = ConnectionMgr::Instance()->Create(io_context, this, session_ptr);
+            assert(conn_ptr);
+            conn_ptr->SetSessionPtr(session_ptr);
 
-    //host 可以是域名,也可以是IP
-    tcp::resolver resolver(io_context);
-    auto          result = resolver.resolve(host, std::to_string(port));
+            // host 可以是域名,也可以是IP
+            tcp::resolver resolver(io_context);
+            auto result = resolver.resolve(host, std::to_string(port));
 
-    asio::async_connect(connPtr->GetSocket(), result, [this, connPtr, host, port, session_ptr](asio::error_code ec, typename decltype(result)::endpoint_type endpoint) {
-      if (ec) {
-        LogErrorA("[Net] DoConnect Host={} Port={} Error={} ", host, port, ec.message());
-        connPtr->Close(false);
-        return;
-      }
+            asio::async_connect(
+                conn_ptr->GetSocket(), result,
+                [this, conn_ptr, host, port, session_ptr](asio::error_code ec,
+                                                          typename decltype(result)::endpoint_type endpoint) {
+                    if (ec)
+                    {
+                        LogErrorA("[Net] DoConnect Host={} Port={} Error={} ", host, port, ec.message());
+                        conn_ptr->Close(false);
+                        return;
+                    }
 
-      auto eventPtr = make_shared<Event>(eEventType::ConnEstablish, connPtr, session_ptr);
-      PushEvent(eventPtr);
-      LogInfoA("[Net] DoConnect Host={} Port={} Success", host, port);
+                    auto event_ptr = make_shared<Event>(eEventType::ConnEstablish, conn_ptr, session_ptr);
+                    PushEvent(event_ptr);
+                    LogInfoA("[Net] DoConnect Host={} Port={} Success", host, port);
 
-      connPtr->DoRead();
-    });
-  }
+                    conn_ptr->DoRead();
+                });
+        }
 
-  bool Net::Run(uint32_t count) {
-    if (m_io_context.poll_one() == 0) {
-      return false;
-    }
+        bool Net::Run(uint32_t count)
+        {
+            if (io_context_.poll_one() == 0)
+            {
+                return false;
+            }
 
-    for (uint32_t i = 0; i < count; ++i) {
-      if (m_io_context.poll_one() == 0) {
-        break;
-      }
-    }
+            for (uint32_t i = 0; i < count; ++i)
+            {
+                if (io_context_.poll_one() == 0)
+                {
+                    break;
+                }
+            }
 
-    return true;
-  }
+            return true;
+        }
 
-  void Net::Stop() {
-    m_io_context.stop();
-    LogInfoA("[Net] Stop");
-  }
+        void Net::Stop()
+        {
+            io_context_.stop();
+            LogInfoA("[Net] Stop");
+        }
 
-}  // namespace Tcp
+    }  // namespace Tcp
 }  // namespace Framework

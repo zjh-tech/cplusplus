@@ -1,123 +1,141 @@
-/*
- * @Descripttion: 
- * @Author: zhengjinhong
- * @Date: 2020-04-13 18:53:26
- * @LastEditors: zhengjinhong
- * @LastEditTime: 2021-02-07 17:06:39
- */
 #include "engine/inc/mysql/mysqlmodule.h"
+
+#include <iomanip>
+#include <iostream>
+
 #include "engine/inc/common/iocontextpool.h"
 #include "engine/inc/log/env.h"
 #include "engine/inc/mysql/dbcommand.h"
 #include "engine/inc/mysql/mysqlconn.h"
-#include <iomanip>
-#include <iostream>
 
-namespace Framework {
-namespace DB {
+namespace Framework
+{
+    namespace DB
+    {
+        shared_ptr<MysqlModule> GMysqlModule = nullptr;
 
-  shared_ptr<MysqlModule> GMysqlModule = nullptr;
+        MysqlModule::MysqlModule() : io_worker_(io_context_)
+        {
+        }
 
-  MysqlModule::MysqlModule()
-    : m_io_worker(m_io_context) {
-  }
+        MysqlModule::~MysqlModule()
+        {
+            conn_vec_.clear();
+            io_context_pool_ = nullptr;
+        }
 
-  MysqlModule::~MysqlModule() {
-    m_conn_vec.clear();
-    m_io_context_pool = nullptr;
-  }
+        bool MysqlModule::Init(vector<DBConnSpec>& conn_specs_vec, uint32_t table_max_count, uint32_t conn_max_count,
+                               shared_ptr<IOContextPool> io_context_pool)
+        {
+            // mysql_thread_init
+            // mysql_thread_end
+            conn_specs_vec_  = conn_specs_vec;
+            table_max_count_ = table_max_count;
+            conn_max_count_  = conn_max_count;
 
-  bool MysqlModule::Init(vector<DBConnSpec>& conn_specs, uint32_t table_max_count, uint32_t conn_max_count, shared_ptr<IOContextPool> io_context_pool) {
-    m_conn_specs      = conn_specs;
-    m_table_max_count = table_max_count;
-    m_conn_max_count  = conn_max_count;
+            if (conn_specs_vec_.size() != conn_max_count)
+            {
+                LogErrorA("[DB] Mysql ConnMaxCount No Match");
+                return false;
+            }
 
-    if (m_conn_specs.size() != conn_max_count) {
-      LogError("[DB] Mysql ConnMaxCount No Match");
-      return false;
-    }
+            io_context_pool_ = io_context_pool;
 
-    m_io_context_pool = io_context_pool;
+            for (uint32_t i = 0; i < conn_max_count_; ++i)
+            {
+                DBConnPtr mysql_conn_ptr =
+                    make_shared<MySQLConn>(conn_specs_vec_[i], io_context_pool_->GetNextIoContext());
+                assert(mysql_conn_ptr);
+                if (!mysql_conn_ptr->Connect())
+                {
+                    LogErrorA("[DB]  Connect {} {} Error", conn_specs_vec_[i].Host, conn_specs_vec_[i].DbName);
+                    return false;
+                }
 
-    for (uint32_t i = 0; i < m_conn_max_count; ++i) {
-      DBConnPtr mysql_conn_ptr = make_shared<MySQLConn>(m_conn_specs[i], io_context_pool->GetNextIoContext());
-      assert(mysql_conn_ptr);
-      if (!mysql_conn_ptr->Connect()) {
-        LogError("[DB]  Connect {} {} Error", m_conn_specs[i].Host, m_conn_specs[i].DbName);
-        return false;
-      }
+                conn_vec_.push_back(mysql_conn_ptr);
+            }
 
-      m_conn_vec.push_back(mysql_conn_ptr);
-    }
+            return true;
+        }
 
-    return true;
-  }
+        bool MysqlModule::Run(uint32_t count)
+        {
+            if (io_context_.poll_one() == 0)
+            {
+                return false;
+            }
 
-  bool MysqlModule::Run(uint32_t count) {
-    if (m_io_context.poll_one() == 0) {
-      return false;
-    }
+            for (uint32_t i = 0; i < count; ++i)
+            {
+                if (io_context_.poll_one() == 0)
+                {
+                    break;
+                }
+            }
 
-    for (uint32_t i = 0; i < count; ++i) {
-      if (m_io_context.poll_one() == 0) {
-        break;
-      }
-    }
+            return true;
+        }
 
-    return true;
-  }
+        void MysqlModule::Stop()
+        {
+            io_context_.stop();
+            LogInfoA("[DB] Stop");
+        }
 
-  void MysqlModule::Stop() {
-    m_io_context.stop();
-    LogInfoA("[DB] Stop");
-  }
+        void MysqlModule::SyncExecCommand(uint64_t uid, ExecSqlFunc exec_sql_func,
+                                          ExecSqlRecordFunc exec_sqlrecord_func)
+        {
+            DBConnPtr conn = choose_connection(uid);
+            if (conn == nullptr)
+            {
+                LogErrorA("[DB] sync_execute choose_connection error uid = {} ", uid);
+                return;
+            }
 
-  void MysqlModule::SyncExecCommand(uint64_t uid, ExecSqlFunc execSqlFunc, ExecSqlRecordFunc execSqlRecordFunc) {
-    DBConnPtr conn = choose_connection(uid);
-    if (conn == nullptr) {
-      LogErrorA("[DB] sync_execute choose_connection error uid = {} ", uid);
-      return;
-    }
+            auto command = make_shared<DBCommand>(exec_sql_func, exec_sqlrecord_func);
+            command->OnExecuteSql(conn);
+            command->OnExecuted();
+        }
 
-    auto command = make_shared<DBCommand>(execSqlFunc, execSqlRecordFunc);
-    command->OnExecuteSql(conn);
-    command->OnExecuted();
-  }
+        void MysqlModule::AsyncExecCommand(uint64_t uid, ExecSqlFunc exec_sql_func,
+                                           ExecSqlRecordFunc exec_sqlrecord_func)
+        {
+            DBConnPtr conn = choose_connection(uid);
+            if (conn == nullptr)
+            {
+                LogErrorA("[DB] async_execute choose_connection error uid = {} ", uid);
+                return;
+            }
 
-  void MysqlModule::AsyncExecCommand(uint64_t uid, ExecSqlFunc execSqlFunc, ExecSqlRecordFunc execSqlRecordFunc) {
-    DBConnPtr conn = choose_connection(uid);
-    if (conn == nullptr) {
-      LogErrorA("[DB] async_execute choose_connection error uid = {} ", uid);
-      return;
-    }
+            auto command = make_shared<DBCommand>(exec_sql_func, exec_sqlrecord_func);
+            asio::post(conn->GetIoContext(), [this, conn, command]() {
+                command->OnExecuteSql(conn);
+                asio::post(io_context_, [this, command]() { command->OnExecuted(); });
+            });
+        }
 
-    auto command = make_shared<DBCommand>(execSqlFunc, execSqlRecordFunc);
-    asio::post(conn->GetIoContext(), [this, conn, command]() {
-      command->OnExecuteSql(conn);
-      asio::post(m_io_context, [this, command]() {
-        command->OnExecuted();
-      });
-    });
-  }
+        DBConnPtr MysqlModule::choose_connection(uint64_t uid)
+        {
+            return conn_vec_[HashDBIndex(uid)];
+        }
 
-  DBConnPtr MysqlModule::choose_connection(uint64_t uid) {
-    return m_conn_vec[HashDBIndex(uid)];
-  }
+        uint64_t MysqlModule::HashDBIndex(uint64_t uid)
+        {
+            return uid % conn_max_count_;
+        }
 
-  uint64_t MysqlModule::HashDBIndex(uint64_t uid) {
-    return uid % m_conn_max_count;
-  }
+        uint64_t MysqlModule::HashTableIndex(uint64_t uid)
+        {
+            return uid % table_max_count_;
+        }
 
-  uint64_t MysqlModule::HashTableIndex(uint64_t uid) {
-    return uid % m_table_max_count;
-  }
+        string MysqlModule::GetTableNameByUID(string table_name, uint64_t uid)
+        {
+            uint64_t table_index = HashTableIndex(uid);
+            stringstream ss;
+            ss << table_name << "_" << setw(2) << setfill('0') << table_index;
+            return ss.str().c_str();
+        }
 
-  string MysqlModule::GetTableNameByUID(string table_name, uint64_t uid) {
-    uint64_t     table_index = HashTableIndex(uid);
-    stringstream ss;
-    ss << table_name << "_" << setw(2) << setfill('0') << table_index;
-    return ss.str().c_str();
-  }
-
-}  // namespace DB
+    }  // namespace DB
 }  // namespace Framework

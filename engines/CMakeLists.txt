@@ -8,35 +8,25 @@ project(engine)
 # version
 
 # platform
-if(UNIX)
-    include(cmake/linux.cmake)
-    include(${PROJECT_SOURCE_DIR}/thirds/mysql/cmake/findmysql.cmake)  
-    #set(MYSQL_LIBRARIES "${PROJECT_SOURCE_DIR}/thirds/mysql/lib/libmysqld.a")    
-    #set(MYSQL_LIBRARIES "${PROJECT_SOURCE_DIR}/thirds/mysql/lib/libmysqlclient.so.20.3.18")
-else()
-    include(cmake/windows.cmake)
-    #include(${PROJECT_SOURCE_DIR}/thirds/mysql/cmake/findmysql.cmake)
-    set(MYSQL_LIBRARIES "${PROJECT_SOURCE_DIR}/thirds/mysql/lib/libmysql.lib")
-endif()
-message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
+include(cmake/linux.cmake)
+include(${PROJECT_SOURCE_DIR}/thirds/mysql/cmake/findmysql.cmake)  
+#set(MYSQL_LIBRARIES "${PROJECT_SOURCE_DIR}/thirds/mysql/lib/libmysqld.a")    
+#set(MYSQL_LIBRARIES "${PROJECT_SOURCE_DIR}/thirds/mysql/lib/libmysqlclient.so.20.3.18")
+
+message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
 # include
 include_directories("${PROJECT_SOURCE_DIR}/")
 
 include_directories("${PROJECT_SOURCE_DIR}/thirds/asio/include")               # asio
 include_directories("${PROJECT_SOURCE_DIR}/thirds/mysql/include")              # mysql
-include_directories("${PROJECT_SOURCE_DIR}/thirds/hiredis")            # hiredis
 
 # link
-if(UNIX)
-    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-        set (LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib/linux/Debug)
-    else()
-        set (LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib/linux/Release)
-    endif()
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set (LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib/Debug)
 else()
-    set (LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib/win/)
+    set (LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib/Release)
 endif()
 
 # sub

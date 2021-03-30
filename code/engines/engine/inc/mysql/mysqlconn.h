@@ -1,58 +1,56 @@
-/*
- * @Descripttion: 
- * @Author: zhengjinhong
- * @Date: 2020-04-13 18:53:43
- * @LastEditors: zhengjinhong
- * @LastEditTime: 2021-02-07 16:48:16
- */
-
 #pragma once
+
+#include <mysql.h>
+
+#include <list>
 
 #include "engine/inc/mysql/dbdefine.h"
 #include "engine/inc/mysql/idbconn.h"
-#include <list>
-#include <mysql.h>
 
 using namespace std;
 
-namespace Framework {
-namespace DB {
+namespace Framework
+{
+    namespace DB
+    {
+        class IDBRecordSet;
 
-  class IDBRecordSet;
+        class MySQLConn : public enable_shared_from_this<MySQLConn>, public IDBConn
+        {
+        public:
+            MySQLConn(DBConnSpec& db_conn_sepc, asio::io_context& io_context);
+            virtual ~MySQLConn();
 
-  class MySQLConn : public enable_shared_from_this<MySQLConn>, public IDBConn {
-  public:
-    MySQLConn(DBConnSpec& info, asio::io_context& context);
-    virtual ~MySQLConn();
+        public:
+            bool Connect() override;
+            asio::io_context& GetIoContext() override
+            {
+                return io_context_;
+            }
 
-  public:
-    bool              Connect() override;
-    asio::io_context& GetIoContext() override {
-      return m_io_context;
-    }
+            string EscapeString(const string& from) override;
+            shared_ptr<IDBRecordSet> ExecuteSql(const string& sql) override;
+            uint32_t GetErrorCode() override;
+            string GetErrorMsg() override;
 
-    string                   EscapeString(const string& from) override;
-    shared_ptr<IDBRecordSet> ExecuteSql(const string& sql) override;
-    uint32_t                 GetErrorCode() override;
-    string                   GetErrorMsg() override;
+            void BeginTransact() override;
+            void CommitTransact() override;
+            void RollbackTransact() override;
 
-    void BeginTransact() override;
-    void CommitTransact() override;
-    void RollbackTransact() override;
+        private:
+            bool is_connected();
+            bool check_connection();
+            void release();
 
-  private:
-    bool isConnected();
-    bool checkConnection();
-    void release();
+        private:
+            DBConnSpec db_conn_sepc_;
 
-  private:
-    DBConnSpec        m_db_conn_info;
-    asio::io_context& m_io_context;
+            asio::io_context& io_context_;
 
-    volatile bool m_connected = false;
+            volatile bool connected_flag_ = false;
 
-    MYSQL* m_pConnection = nullptr;
-  };
+            MYSQL* mysql_ptr = nullptr;
+        };
 
-}  // namespace DB
+    }  // namespace DB
 }  // namespace Framework

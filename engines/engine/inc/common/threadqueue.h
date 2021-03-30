@@ -1,33 +1,26 @@
-/*
- * @Descripttion: 
- * @Author: zhengjinhong
- * @Date: 2020-05-01 15:28:00
- * @LastEditors: zhengjinhong
- * @LastEditTime: 2020-05-01 15:34:08
- */
-
 #pragma once
 
-namespace Framework {
+namespace Framework
+{
+    // unlock queue
+    class ThreadQueue
+    {
+    public:
+        ThreadQueue();
+        virtual ~ThreadQueue();
 
-//unlock queue
-class ThreadQueue {
-public:
-  ThreadQueue();
-  virtual ~ThreadQueue();
+    public:
+        bool Init(int size);
 
-public:
-  bool Init(int nSize);
+        bool PushBack(void* ptr);
 
-  bool PushBack(void* ptr);
+        void* PopFront();
 
-  void* PopFront();
-
-private:
-  void** m_pArray;
-  int    m_nHead;
-  int    m_nTail;
-  int    m_nSize;
-};
+    private:
+        void** array_ptr_;
+        int head_;
+        int tail_;
+        int size_;
+    };
 
 }  // namespace Framework

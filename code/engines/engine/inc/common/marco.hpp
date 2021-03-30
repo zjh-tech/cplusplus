@@ -1,11 +1,3 @@
-/*
- * @Descripttion: 
- * @Author: zhengjinhong
- * @Date: 2020-04-20 10:01:52
- * @LastEditors: zhengjinhong
- * @LastEditTime: 2020-04-22 10:10:16
- */
-
 #pragma once
 
 #include <cinttypes>

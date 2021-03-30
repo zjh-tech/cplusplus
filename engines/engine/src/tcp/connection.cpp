@@ -1,12 +1,5 @@
-/*
- * @Descripttion: 
- * @Author: zhengjinhong
- * @Date: 2020-10-19 17:52:46
- * @LastEditors: zhengjinhong
- * @LastEditTime: 2021-02-07 17:30:19
- */
-
 #include "engine/inc/tcp/connection.h"
+
 #include "engine/inc/common/icoder.h"
 #include "engine/inc/common/netstream.h"
 #include "engine/inc/log/env.h"
@@ -16,251 +9,313 @@
 
 using namespace Framework;
 
-namespace Framework {
-namespace Tcp {
+namespace Framework
+{
+    namespace Tcp
+    {
+        atomic<int64_t> Connection::s_send_qps_count = 0;
+        atomic<int64_t> Connection::s_recv_qps_count = 0;
 
-  atomic<int64_t> Connection::s_send_qps_count = 0;
-  atomic<int64_t> Connection::s_recv_qps_count = 0;
-
-  Connection::Connection(asio::io_context& ioContext, INet* net, shared_ptr<ISession> session_ptr, uint64_t conn_id)
-    : m_io_context(ioContext)
-    , m_socket(m_io_context) {
-    m_session_ptr = session_ptr;
-    m_net_ptr     = net;
-    m_conn_id     = conn_id;
-  }
-
-  Connection::~Connection() {
-  }
-
-  void Connection::DoRead() {
-    if (!m_socket.is_open()) {
-      return;
-    }
-
-    auto self = this->shared_from_this();
-    auto buf  = asio::buffer((char*)m_recv_buffer + m_recv_buffer_index, MAX_MESSAGE_SIZE - m_recv_buffer_index);
-    m_socket.async_read_some(buf, [this, self](error_code ec, size_t bytes_transferred) {
-      m_recv_buffer_index += bytes_transferred;
-      uint32_t read_index = 0;
-
-      if (m_state.load() != (int)ConnctionState::Establish) {
-        LogErrorA("[Net] ConnID={} AsyncReadSome Is Not ConnctionState::Establish ", m_conn_id);
-        return;
-      }
-
-      if (m_socket.is_open() == false) {
-        LogErrorA("[Net] ConnID={} AsyncReadSome Socket IsOpen Error", m_conn_id);
-        return;
-      }
-
-      if (ec) {
-        LogErrorA("[Net] ConnID={} AsyncReadSome Socket IsOpen Error={}", m_conn_id, ec.message());
-        Close(false);
-        return;
-      }
-
-      if (bytes_transferred == 0) {
-        LogWarnA("[Net] ConnID={} AsyncReadSome Transfered Bytes = 0", m_conn_id);
-      }
-
-      auto sessionPtr = GetSessionPtr();
-      if (sessionPtr == nullptr) {
-        LogErrorA("[Net] ConnID={} AsyncReadSome GetSessionPtr Error", m_conn_id);
-        return;
-      }
-
-      auto coder = sessionPtr->GetCoder();
-
-      if (coder == nullptr) {
-        LogErrorA("[Net] ConnID={} AsyncReadSome GetCoder Error", m_conn_id);
-        return;
-      }
-
-      while (read_index < m_recv_buffer_index) {
-        uint32_t header_len = coder->GetHeaderLen();
-        if (read_index + header_len > m_recv_buffer_index) {
-          LogDebugA("[Net] ConnID={} AsyncReadSome Not Enough Header", m_conn_id);
-          goto DO_READ_FLAG;
+        Connection::Connection(asio::io_context& io_context, INet* net, shared_ptr<ISession> session_ptr,
+                               uint64_t conn_id)
+            : io_context_(io_context), socket_(io_context_)
+        {
+            session_ptr_ = session_ptr;
+            net_ptr_     = net;
+            conn_id_     = conn_id;
         }
 
-        uint32_t body_len = coder->GetBodyLen((char*)m_recv_buffer + read_index);
-        if (read_index + body_len > m_recv_buffer_index) {
-          LogDebugA("[Net] ConnID={} AsyncReadSome Not Enough Body", m_conn_id);
-          goto DO_READ_FLAG;
+        Connection::~Connection()
+        {
         }
 
-        read_index += header_len;
+        void Connection::DoRead()
+        {
+            if (!socket_.is_open())
+            {
+                return;
+            }
 
-        string temp_str(m_recv_buffer + read_index, body_len);
-        read_index += body_len;
+            auto self = this->shared_from_this();
+            auto buf  = asio::buffer((char*)recv_buffer_ + recv_buffer_index_, MAX_MESSAGE_SIZE - recv_buffer_index_);
+            socket_.async_read_some(buf, [this, self](error_code ec, size_t bytes_transferred) {
+                recv_buffer_index_ += bytes_transferred;
+                uint32_t read_index = 0;
 
-        //unzip
-        if (coder->UnzipBody(temp_str) == false) {
-          LogErrorA("[Net] ConnID={} AsyncReadSome UnZip Error", m_conn_id);
-          Close(false);
-          return;
+                if (state_.load() != (int)ConnctionState::Establish)
+                {
+                    LogErrorA("[Net] ConnID={} AsyncReadSome Is Not ConnctionState::Establish ", conn_id_);
+                    return;
+                }
+
+                if (socket_.is_open() == false)
+                {
+                    LogErrorA("[Net] ConnID={} AsyncReadSome Socket IsOpen Error", conn_id_);
+                    return;
+                }
+
+                if (ec)
+                {
+                    LogErrorA("[Net] ConnID={} AsyncReadSome Socket IsOpen Error={}", conn_id_, ec.message());
+                    Close(false);
+                    return;
+                }
+
+                if (bytes_transferred == 0)
+                {
+                    LogWarnA("[Net] ConnID={} AsyncReadSome Transfered Bytes = 0", conn_id_);
+                }
+
+                auto sessionPtr = GetSessionPtr();
+                if (sessionPtr == nullptr)
+                {
+                    LogErrorA("[Net] ConnID={} AsyncReadSome GetSessionPtr Error", conn_id_);
+                    return;
+                }
+
+                auto coder = sessionPtr->GetCoder();
+
+                if (coder == nullptr)
+                {
+                    LogErrorA("[Net] ConnID={} AsyncReadSome GetCoder Error", conn_id_);
+                    return;
+                }
+
+                while (read_index < recv_buffer_index_)
+                {
+                    uint32_t header_len = coder->GetHeaderLen();
+                    if (read_index + header_len > recv_buffer_index_)
+                    {
+                        LogDebugA("[Net] ConnID={} AsyncReadSome Not Enough Header", conn_id_);
+                        goto DO_READ_FLAG;
+                    }
+
+                    uint32_t body_len              = coder->GetBodyLen((char*)recv_buffer_ + read_index);
+                    uint32_t one_message_total_len = header_len + body_len;
+                    if (one_message_total_len > MAX_MESSAGE_SIZE)
+                    {
+                        LogErrorA("[Net] ConnID={} Total Len={} Error", conn_id_, one_message_total_len);
+                        Close(false);
+                        return;
+                    }
+
+                    if (read_index + body_len > recv_buffer_index_)
+                    {
+                        LogDebugA("[Net] ConnID={} AsyncReadSome Not Enough Body", conn_id_);
+                        goto DO_READ_FLAG;
+                    }
+
+                    read_index += header_len;
+
+                    string temp_str(recv_buffer_ + read_index, body_len);
+                    read_index += body_len;
+
+                    // unzip
+                    if (coder->UnzipBody(temp_str) == false)
+                    {
+                        LogErrorA("[Net] ConnID={} AsyncReadSome UnZip Error", conn_id_);
+                        Close(false);
+                        return;
+                    }
+
+                    // decode
+                    coder->DecodeBody(temp_str);
+
+                    auto evtPtr = make_shared<Event>(eEventType::RecvMsg, self, GetSessionPtr(), move(temp_str));
+                    net_ptr_->PushEvent(evtPtr);
+
+                    ++s_recv_qps_count;
+                }
+
+            DO_READ_FLAG:
+                assert(read_index <= recv_buffer_index_);
+                if (read_index != recv_buffer_index_)
+                {
+                    memmove(recv_buffer_, recv_buffer_ + read_index, recv_buffer_index_ - read_index);
+                    recv_buffer_index_ -= read_index;
+                }
+                else
+                {
+                    recv_buffer_index_ = 0;
+                }
+
+                self->DoRead();
+            });
         }
 
-        //decode
-        coder->DecodeBody(temp_str);
+        void Connection::DoWrite()
+        {
+            if (is_send_finish())
+            {
+                return;
+            }
 
-        auto evtPtr = make_shared<Event>(eEventType::RecvMsg, self, GetSessionPtr(), move(temp_str));
-        m_net_ptr->PushEvent(evtPtr);
+            uint32_t two_send_vec_total_size = two_send_vec_ptr_->size();
+            if (two_send_vec_total_size == two_send_vec_index_)
+            {
+                two_send_vec_ptr_   = send_vec_ptr_;
+                two_send_vec_index_ = 0;
+            }
 
-        ++s_recv_qps_count;
-      }
+            vector<asio::const_buffer> buffers;
+            size_t total_size = 0;
+            for (uint32_t i = two_send_vec_index_; i < two_send_vec_total_size; ++i)
+            {
+                auto& send_info = (*two_send_vec_ptr_)[i];
+                total_size += send_info.size();
+                if (total_size >= MAX_MESSAGE_SIZE)
+                {
+                    break;
+                }
 
-    DO_READ_FLAG:
-      assert(read_index <= m_recv_buffer_index);
-      if (read_index != m_recv_buffer_index) {
-        memmove(m_recv_buffer, m_recv_buffer + read_index, m_recv_buffer_index - read_index);
-        m_recv_buffer_index -= read_index;
-      } else {
-        m_recv_buffer_index = 0;
-      }
+                ++two_send_vec_index_;
+                buffers.emplace_back(send_info.data(), send_info.size());
+            }
+            auto self = this->shared_from_this();
+            asio::async_write(socket_, buffers,
+                              [this, self, total_size](asio::error_code ec, size_t bytes_transferred) {
+                                  if (socket_.is_open() == false)
+                                  {
+                                      LogErrorA("[Net] ConnID={} AsyncWrite Socket IsOpen Error", conn_id_);
+                                      return;
+                                  }
 
-      self->DoRead();
-    });
-  }
+                                  auto session = GetSessionPtr();
+                                  if (session == nullptr)
+                                  {
+                                      LogErrorA("[Net] ConnID={} AsyncWrite GetSessionPtr Error", conn_id_);
+                                      return;
+                                  }
 
-  void Connection::DoWrite() {
-    if (m_send_vec.empty()) {
-      return;
-    }
+                                  if (ec)
+                                  {
+                                      LogErrorA("[Net] connID={} SessionID={} AsyncWrite  Error={} ", conn_id_,
+                                                session->GetSessionID(), ec.message());
+                                      Close(false);
+                                      return;
+                                  }
 
-    m_mix_send_vec.swap(m_send_vec);
+                                  if (bytes_transferred != total_size)
+                                  {
+                                      assert(false);
+                                      LogErrorA("[Net] connID={} SessionID={} AsyncWrite  BytesTransfered Error ",
+                                                conn_id_, session->GetSessionID());
+                                      Close(false);
+                                      return;
+                                  }
 
-    vector<asio::const_buffer> buffers;
-    size_t                     total_size = 0;
+                                  DoWrite();
+                              });
+        }
 
-    for (auto& data : m_mix_send_vec) {
-      buffers.emplace_back(data.data(), data.size());
-      total_size += data.size();
+        void Connection::AsyncSend(const char* msg, uint32_t len)
+        {
+            auto self = this->shared_from_this();
+            string str(msg, len);
+            asio::post(io_context_, [data = move(str), this, self]() {
+                if (!socket_.is_open())
+                {
+                    return;
+                }
 
-      if (total_size >= MAX_MESSAGE_SIZE) {
-        break;
-      }
-    }
+                if (state_.load() != (int)ConnctionState::Establish)
+                {
+                    return;
+                }
 
-    auto self = this->shared_from_this();
-    asio::async_write(m_socket, buffers, [this, self, total_size](asio::error_code ec, size_t bytes_transferred) {
-      if (m_socket.is_open() == false) {
-        LogErrorA("[Net] ConnID={} AsyncWrite Socket IsOpen Error", m_conn_id);
-        return;
-      }
+                auto is_free_flag = send_vec_ptr_->empty() && two_send_vec_ptr_->empty();
+                send_vec_ptr_->emplace_back(move(data));
 
-      auto session = GetSessionPtr();
-      if (session == nullptr) {
-        LogErrorA("[Net] ConnID={} AsyncWrite GetSessionPtr Error", m_conn_id);
-        return;
-      }
+                ++s_send_qps_count;
+                if (is_free_flag)
+                {
+                    DoWrite();
+                }
+            });
+        }
 
-      if (ec) {
-        LogErrorA("[Net] connID={} SessionID={} AsyncWrite  Error={} ", m_conn_id, session->GetSessionID(), ec.message());
-        Close(false);
-        return;
-      }
+        void Connection::Terminate()
+        {
+            Close(true);
+        }
 
-      if (bytes_transferred != total_size) {
-        assert(false);
-        LogErrorA("[Net] connID={} SessionID={} AsyncWrite  BytesTransfered Error ", m_conn_id, session->GetSessionID());
-        Close(false);
-        return;
-      }
+        bool Connection::is_send_finish()
+        {
+            return (send_vec_ptr_->size() == 0 && two_send_vec_ptr_->size() == two_send_vec_index_) ? true : false;
+        }
 
-      m_mix_send_vec.clear();
-      DoWrite();
-    });
-  }
+        void Connection::add_check_send_end_timer(int mill_sec, bool terminate)
+        {
+            check_send_end_timer_ = make_shared<asio::steady_timer>(socket_.get_executor());
+            chrono::milliseconds time_long{mill_sec};
+            check_send_end_timer_->expires_after(time_long);
 
-  void Connection::AsyncSend(const char* msg, uint32_t len) {
-    auto   self = this->shared_from_this();
-    string str(msg, len);
-    asio::post(m_io_context, [data = move(str), this, self]() {
-      if (!m_socket.is_open()) {
-        return;
-      }
+            auto self = this->shared_from_this();
+            check_send_end_timer_->async_wait([this, self, terminate](asio::error_code ec) {
+                if (ec)
+                {
+                    return;
+                }
 
-      if (m_state.load() != (int)ConnctionState::Establish) {
-        return;
-      }
+                if (!terminate)
+                {
+                    close_socket();
+                    return;
+                }
 
-      auto is_free_flag = m_send_vec.empty() && m_mix_send_vec.empty();
-      m_send_vec.emplace_back(move(data));
+                if (is_send_finish())
+                {
+                    close_socket();
+                    LogInfoA("[Net] ConnID={} All Message Send Finish", conn_id_);
+                    return;
+                }
 
-      ++s_send_qps_count;
-      if (is_free_flag) {
-        DoWrite();
-      }
-    });
-  }
+                add_check_send_end_timer(1000, terminate);
+            });
+        }
 
-  void Connection::Terminate() {
-    Close(true);
-  }
+        void Connection::close_socket()
+        {
+            asio::error_code ignored_ec;
+            socket_.shutdown(asio::ip::tcp::socket::shutdown_both, ignored_ec);
+            socket_.close(ignored_ec);
+        }
 
-  void Connection::addCheckSendEndTimer(int mill_sec, bool terminate) {
-    m_check_send_end_timer = make_shared<asio::steady_timer>(m_socket.get_executor());
-    chrono::milliseconds time_long{mill_sec};
-    m_check_send_end_timer->expires_after(time_long);
+        void Connection::Close(bool autoFlag)
+        {
+            int old_state = (int)ConnctionState::Establish;
+            if (state_.compare_exchange_strong(old_state, (int)ConnctionState::Closed) == false)
+            {
+                return;
+            }
 
-    auto self = this->shared_from_this();
-    m_check_send_end_timer->async_wait([this, self, terminate](asio::error_code ec) {
-      if (ec) {
-        return;
-      }
+            if (autoFlag)
+            {
+                LogInfoA("[Net] ConnID={} Active Closed", conn_id_);
+                //等待全部数据发送完成
+            }
+            else
+            {
+                LogInfoA("[Net] ConnID={} Passive Closed", conn_id_);
+            }
 
-      if (!terminate) {
-        closeSocket();
-        return;
-      }
+            add_check_send_end_timer(0, autoFlag);
 
-      if (m_send_vec.size() == 0 && m_mix_send_vec.size()) {
-        closeSocket();
-        LogInfoA("[Net] ConnID={} All Message Send Finish", m_conn_id);
-        return;
-      }
+            auto self   = shared_from_this();
+            auto evtPtr = make_shared<Event>(eEventType::ConnTerminate, self, GetSessionPtr());
+            net_ptr_->PushEvent(evtPtr);
+        }
 
-      addCheckSendEndTimer(1000, terminate);
-    });
-  }
+        void Connection::PrintQps(int64_t diff_time)
+        {
+            auto send_count = s_send_qps_count.load();
+            s_send_qps_count.store(0);
 
-  void Connection::closeSocket() {
-    asio::error_code ignored_ec;
-    m_socket.shutdown(asio::ip::tcp::socket::shutdown_both, ignored_ec);
-    m_socket.close(ignored_ec);
-  }
+            auto recv_count = s_recv_qps_count.load();
+            s_recv_qps_count.store(0);
+            LogInfoA("QPS: recv {}, TotalCount: {} ,IntervalTime: {}", send_count / diff_time, send_count, diff_time);
+            LogInfoA("QPS: send {}, TotalCount: {} ,IntervalTime: {}", recv_count / diff_time, recv_count, diff_time);
+        }
 
-  void Connection::Close(bool autoFlag) {
-    int old_state = (int)ConnctionState::Establish;
-    if (m_state.compare_exchange_strong(old_state, (int)ConnctionState::Closed) == false) {
-      return;
-    }
-
-    if (autoFlag) {
-      LogInfoA("[Net] ConnID={} Active Closed", m_conn_id);
-      //等待全部数据发送完成
-    } else {
-      LogInfoA("[Net] ConnID={} Passive Closed", m_conn_id);
-    }
-
-    addCheckSendEndTimer(0, autoFlag);
-
-    auto self   = shared_from_this();
-    auto evtPtr = make_shared<Event>(eEventType::ConnTerminate, self, GetSessionPtr());
-    m_net_ptr->PushEvent(evtPtr);
-  }
-
-  void Connection::PrintQps(int64_t diff_time) {
-    auto send_count = s_send_qps_count.load();
-    s_send_qps_count.store(0);
-
-    auto recv_count = s_recv_qps_count.load();
-    s_recv_qps_count.store(0);
-    LogInfoA("QPS: recv {}, TotalCount: {} ,IntervalTime: {}", send_count / diff_time, send_count, diff_time);
-    LogInfoA("QPS: send {}, TotalCount: {} ,IntervalTime: {}", recv_count / diff_time, recv_count, diff_time);
-  }
-
-}  // namespace Tcp
+    }  // namespace Tcp
 }  // namespace Framework

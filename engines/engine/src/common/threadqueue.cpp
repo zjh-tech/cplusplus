@@ -1,67 +1,65 @@
-/*
- * @Descripttion: 
- * @Author: zhengjinhong
- * @Date: 2020-05-01 15:28:23
- * @LastEditors: zhengjinhong
- * @LastEditTime: 2021-02-07 17:28:27
- */
-
 #include "engine/inc/common/threadqueue.h"
 
-namespace Framework {
+namespace Framework
+{
+    ThreadQueue::ThreadQueue()
+    {
+        array_ptr_ = nullptr;
+        head_      = 0;
+        tail_      = 0;
+        size_      = 0;
+    }
 
-ThreadQueue::ThreadQueue() {
-  m_pArray = nullptr;
-  m_nHead  = 0;
-  m_nTail  = 0;
-  m_nSize  = 0;
-}
+    ThreadQueue::~ThreadQueue()
+    {
+        if (array_ptr_)
+        {
+            delete[] array_ptr_;
+            array_ptr_ = nullptr;
+        }
+    }
 
-ThreadQueue::~ThreadQueue() {
-  if (m_pArray) {
-    delete[] m_pArray;
-    m_pArray = nullptr;
-  }
-}
+    bool ThreadQueue::Init(int size)
+    {
+        if (size <= 0)
+        {
+            return false;
+        }
 
-bool ThreadQueue::Init(int nSize) {
-  if (nSize <= 0) {
-    return false;
-  }
+        array_ptr_ = new void*[size];
+        if (!array_ptr_)
+        {
+            return false;
+        }
+        size_ = size;
+        return true;
+    }
 
-  m_pArray = new void*[nSize];
-  if (!m_pArray) {
-    return false;
-  }
-  m_nSize = nSize;
-  return true;
-}
+    bool ThreadQueue::PushBack(void* ptr)
+    {
+        int dist = tail_ + size_ - head_;
+        int used = dist >= size_ ? (dist - size_) : dist;
+        if (used >= size_ - 1) return false;
 
-bool ThreadQueue::PushBack(void* ptr) {
-  int nDist = m_nTail + m_nSize - m_nHead;
-  int nUsed = nDist >= m_nSize ? (nDist - m_nSize) : nDist;
-  if (nUsed >= m_nSize - 1)
-    return false;
+        array_ptr_[tail_] = ptr;
+        if (++tail_ >= size_) tail_ = 0;
 
-  m_pArray[m_nTail] = ptr;
-  if (++m_nTail >= m_nSize)
-    m_nTail = 0;
+        return true;
+    }
 
-  return true;
-}
+    void* ThreadQueue::PopFront()
+    {
+        int dist = tail_ + size_ - head_;
+        int used = dist >= size_ ? (dist - size_) : dist;
+        if (0 == used)
+        {
+            return nullptr;
+        }
 
-void* ThreadQueue::PopFront() {
-  int nDist = m_nTail + m_nSize - m_nHead;
-  int nUsed = nDist >= m_nSize ? (nDist - m_nSize) : nDist;
-  if (0 == nUsed) {
-    return nullptr;
-  }
+        void* ptr = array_ptr_[head_];
+        if (++head_ >= size_) head_ = 0;
 
-  void* ptr = m_pArray[m_nHead];
-  if (++m_nHead >= m_nSize)
-    m_nHead = 0;
-
-  return ptr;
-}
+        return ptr;
+    }
 
 }  // namespace Framework

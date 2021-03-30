@@ -1,11 +1,3 @@
-/*
- * @Descripttion: 
- * @Author: zhengjinhong
- * @Date: 2020-11-19 17:14:16
- * @LastEditors: zhengjinhong
- * @LastEditTime: 2020-11-23 17:55:21
- */
-
 #pragma once
 
 #include <cinttypes>
@@ -14,25 +6,26 @@
 
 using namespace std;
 
-namespace Framework {
+namespace Framework
+{
+    class ErrorString
+    {
+    public:
+        ErrorString(const char* content) : content_(content)
+        {
+        }
 
-class ErrorString {
-public:
-  ErrorString(const char* text)
-    : s(text) {
-  }
+        const char* Str()
+        {
+            return content_;
+        }
 
-  const char* Str() {
-    return s;
-  }
+    private:
+        const char* content_;
+    };
 
-private:
-  const char* s;
-};
+    using ErrorStringPtr = shared_ptr<ErrorString>;
 
-using ErrorStringPtr = shared_ptr<ErrorString>;
-
-#define CREATE_ERROR_STRING(text) \
-  make_shared<ErrorString>(text)
+#define CREATE_ERROR_STRING(text) make_shared<ErrorString>(text)
 
 }  // namespace Framework

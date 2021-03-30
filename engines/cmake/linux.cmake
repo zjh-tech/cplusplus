@@ -36,21 +36,15 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE} -O2 "
 add_definitions(-DASIO_HAS_EPOLL)
 
 # lib
-
 set(THREAD_LIB pthread)
 set(FILE_SYSTEM_LIB stdc++fs)
+set(DYNAMIC_LOAD_LIB  dl)
 if (GPERFTOOLS_FLAG)
 	set(GPERFTOOLS_LIB profiler unwind tcmalloc)
 endif()
-set(DYNAMIC_LOAD_LIB  dl)
-
 
 set(ENGINE_COMMON_LIB 			ecommon)
 set(ENGINE_LOG_LIB 				elogger)
 set(ENGINE_TCP_LIB 				etcp)
-set(ENGINE_UDP_LIB      		eudp)
 set(ENGINE_MYSQL_LIB 			emysql)
 set(ENGINE_TIMER_LIB 			etimer)
-set(ENGINE_REDIS_LIB 	    	eredis)
-set(ENGINE_CSHARP_LIB 	    	ecsharp)
-
