@@ -8,8 +8,7 @@ namespace Framework
 {
     namespace Tcp
     {
-        shared_ptr<IConnection> ConnectionMgr::Create(asio::io_context& io_context, INet* net,
-                                                      shared_ptr<ISession> sess)
+        shared_ptr<IConnection> ConnectionMgr::Create(asio::io_context& io_context, INet* net, shared_ptr<ISession> sess)
         {
             ++conn_id_;
 

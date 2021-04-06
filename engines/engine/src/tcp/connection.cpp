@@ -16,9 +16,7 @@ namespace Framework
         atomic<int64_t> Connection::s_send_qps_count = 0;
         atomic<int64_t> Connection::s_recv_qps_count = 0;
 
-        Connection::Connection(asio::io_context& io_context, INet* net, shared_ptr<ISession> session_ptr,
-                               uint64_t conn_id)
-            : io_context_(io_context), socket_(io_context_)
+        Connection::Connection(asio::io_context& io_context, INet* net, shared_ptr<ISession> session_ptr, uint64_t conn_id) : io_context_(io_context), socket_(io_context_)
         {
             session_ptr_ = session_ptr;
             net_ptr_     = net;
@@ -172,40 +170,37 @@ namespace Framework
                 buffers.emplace_back(send_info.data(), send_info.size());
             }
             auto self = this->shared_from_this();
-            asio::async_write(socket_, buffers,
-                              [this, self, total_size](asio::error_code ec, size_t bytes_transferred) {
-                                  if (socket_.is_open() == false)
-                                  {
-                                      LogErrorA("[Net] ConnID={} AsyncWrite Socket IsOpen Error", conn_id_);
-                                      return;
-                                  }
+            asio::async_write(socket_, buffers, [this, self, total_size](asio::error_code ec, size_t bytes_transferred) {
+                if (socket_.is_open() == false)
+                {
+                    LogErrorA("[Net] ConnID={} AsyncWrite Socket IsOpen Error", conn_id_);
+                    return;
+                }
 
-                                  auto session = GetSessionPtr();
-                                  if (session == nullptr)
-                                  {
-                                      LogErrorA("[Net] ConnID={} AsyncWrite GetSessionPtr Error", conn_id_);
-                                      return;
-                                  }
+                auto session = GetSessionPtr();
+                if (session == nullptr)
+                {
+                    LogErrorA("[Net] ConnID={} AsyncWrite GetSessionPtr Error", conn_id_);
+                    return;
+                }
 
-                                  if (ec)
-                                  {
-                                      LogErrorA("[Net] connID={} SessionID={} AsyncWrite  Error={} ", conn_id_,
-                                                session->GetSessionID(), ec.message());
-                                      Close(false);
-                                      return;
-                                  }
+                if (ec)
+                {
+                    LogErrorA("[Net] connID={} SessionID={} AsyncWrite  Error={} ", conn_id_, session->GetSessionID(), ec.message());
+                    Close(false);
+                    return;
+                }
 
-                                  if (bytes_transferred != total_size)
-                                  {
-                                      assert(false);
-                                      LogErrorA("[Net] connID={} SessionID={} AsyncWrite  BytesTransfered Error ",
-                                                conn_id_, session->GetSessionID());
-                                      Close(false);
-                                      return;
-                                  }
+                if (bytes_transferred != total_size)
+                {
+                    assert(false);
+                    LogErrorA("[Net] connID={} SessionID={} AsyncWrite  BytesTransfered Error ", conn_id_, session->GetSessionID());
+                    Close(false);
+                    return;
+                }
 
-                                  DoWrite();
-                              });
+                DoWrite();
+            });
         }
 
         void Connection::AsyncSend(const char* msg, uint32_t len)

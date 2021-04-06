@@ -19,9 +19,8 @@ time_t CalcDelay::GetNearestDelayEveryMin(int min)
     time_t cur_time     = Utils::GetSecTime();
     std::tm* tm_cur_ptr = std::localtime(&cur_time);
 
-    time_t remain_time =
-        ONE_HOUR_MILL_MACRO - (tm_cur_ptr->tm_min * ONE_MIN_MILL_MACRO + tm_cur_ptr->tm_sec * ONE_SEC_MILL_MARCO);
-    time_t delay = remain_time % (ONE_MIN_MILL_MACRO * min);
+    time_t remain_time = ONE_HOUR_MILL_MACRO - (tm_cur_ptr->tm_min * ONE_MIN_MILL_MACRO + tm_cur_ptr->tm_sec * ONE_SEC_MILL_MARCO);
+    time_t delay       = remain_time % (ONE_MIN_MILL_MACRO * min);
     return delay;
 }
 
@@ -44,11 +43,9 @@ time_t CalcDelay::GetNearestDelayEveryDay(int hour, int min)
     else
     {
         // pass triggle time
-        time_t next_diff_time = hour * ONE_HOUR_MILL_MACRO + min * ONE_MIN_MILL_MACRO;  //(0-next)
-        time_t cur_diff_time  = tm_cur_ptr->tm_hour % hour * ONE_HOUR_MILL_MACRO +
-                               tm_cur_ptr->tm_min * ONE_MIN_MILL_MACRO +
-                               tm_cur_ptr->tm_sec * ONE_SEC_MILL_MARCO;  //(0-cur)
-        delay = next_diff_time - cur_diff_time;
+        time_t next_diff_time = hour * ONE_HOUR_MILL_MACRO + min * ONE_MIN_MILL_MACRO;                                                                                 //(0-next)
+        time_t cur_diff_time  = tm_cur_ptr->tm_hour % hour * ONE_HOUR_MILL_MACRO + tm_cur_ptr->tm_min * ONE_MIN_MILL_MACRO + tm_cur_ptr->tm_sec * ONE_SEC_MILL_MARCO;  //(0-cur)
+        delay                 = next_diff_time - cur_diff_time;
     }
 
     return delay;

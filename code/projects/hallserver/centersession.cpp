@@ -1,10 +1,3 @@
-/*
- * @Descripttion: 
- * @Author: zhengjinhong
- * @Date: 2020-11-17 10:43:16
- * @LastEditors: zhengjinhong
- * @LastEditTime: 2020-11-17 11:24:28
- */
 
 #include "centersession.h"
 

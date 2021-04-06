@@ -37,10 +37,9 @@ namespace Framework
         public:
             virtual ~IConnectionMgr(){};
 
-            virtual shared_ptr<IConnection> Create(asio::io_context& ioContext, INet* net,
-                                                   shared_ptr<ISession> sess) = 0;
-            virtual void Remove(uint64_t connID)                              = 0;
-            virtual uint32_t GetConnCount()                                   = 0;
+            virtual shared_ptr<IConnection> Create(asio::io_context& ioContext, INet* net, shared_ptr<ISession> sess) = 0;
+            virtual void Remove(uint64_t connID)                                                                      = 0;
+            virtual uint32_t GetConnCount()                                                                           = 0;
         };
 
     }  // namespace Tcp

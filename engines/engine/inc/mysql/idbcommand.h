@@ -25,9 +25,8 @@ namespace Framework
             virtual void OnExecuted()                           = 0;
         };
 
-        using ExecSqlFunc = function<tuple<int32_t, string, shared_ptr<IDBRecordSet>>(shared_ptr<IDBConn> conn)>;
-        using ExecSqlRecordFunc =
-            function<void(int32_t errorcode, string errormsg, shared_ptr<IDBRecordSet> recordset)>;
+        using ExecSqlFunc       = function<tuple<int32_t, string, shared_ptr<IDBRecordSet>>(shared_ptr<IDBConn> conn)>;
+        using ExecSqlRecordFunc = function<void(int32_t errorcode, string errormsg, shared_ptr<IDBRecordSet> recordset)>;
 
     }  // namespace DB
 }  // namespace Framework

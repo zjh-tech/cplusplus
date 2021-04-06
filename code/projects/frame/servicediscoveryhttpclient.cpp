@@ -112,13 +112,13 @@ bool OnHandlerHttpServiceDiscoveryAck(const char* msg, uint32_t msg_len) {
     if (ack.sd_info().s2s_inter_listen() != "" && ack.sd_info().s2s_outer_listen() != "") {
       tuple<bool, string, uint32_t> attr = ConvertHostAndPort(ack.sd_info().s2s_outer_listen());
       if (get<0>(attr) == false) {
-        LogError("[ServiceDiscovery] S2S Outer Listen Error");
+        LogErrorA("[ServiceDiscovery] S2S Outer Listen Error");
         GServer->Quit();
         return true;
       }
 
       GSSServerSessionMgr->Listen(get<1>(attr), get<2>(attr), GServer->GetIOContextPool(), []() {
-        LogError("[ServiceDiscovery] S2S Listen Error");
+        LogErrorA("[ServiceDiscovery] S2S Listen Error");
         GServer->Quit();
       });
     }

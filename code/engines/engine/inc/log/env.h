@@ -6,18 +6,16 @@
 using namespace Framework;
 using namespace Framework::Log;
 
-#define LOG_INIT(path, filename, level)              \
-    GLogger = make_shared<Framework::Log::Logger>(); \
-    if (GLogger)                                     \
-    {                                                \
-        GLogger->Init(path, filename, level);        \
-    }
+#define LOG_INIT(path, filename, level)            \
+  GLogger = make_shared<Framework::Log::Logger>(); \
+  if (GLogger) {                                   \
+    GLogger->Init(path, filename, level);          \
+  }
 
-#define LOG_UNINIT()       \
-    if (GLogger)           \
-    {                      \
-        GLogger->UnInit(); \
-    }
+#define LOG_UNINIT()   \
+  if (GLogger) {       \
+    GLogger->UnInit(); \
+  }
 
 #define LogDebugA(fmt, ...) GLogger->AddLogEvent(eLogLevel::DEBUG_LEVEL, fmt, ##__VA_ARGS__)
 // GLogger->AddLogEvent(eLogLevel::DEBUG_LEVEL, "{}#{}: " fmt, __FILENAME__, __LINE__, ##__VA_ARGS__)

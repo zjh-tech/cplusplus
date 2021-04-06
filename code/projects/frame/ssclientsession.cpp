@@ -1,11 +1,3 @@
-/*
- * @Descripttion: 
- * @Author: zhengjinhong
- * @Date: 2020-10-19 11:45:33
- * @LastEditors: zhengjinhong
- * @LastEditTime: 2021-01-08 16:29:48
- */
-
 #include "ssclientsession.h"
 #include "engine/inc/common/utils.hpp"
 #include "engine/inc/log/env.h"
@@ -175,7 +167,7 @@ void SSClientSessionMgr::Listen(const string& ip, uint32_t port, shared_ptr<ISSC
 
   m_listen  = make_shared<Listener>(io_context_pool);
   auto self = this->shared_from_this();
-  m_listen->start(ip, port, self);
+  m_listen->Start(ip, port, self);
 }
 
 shared_ptr<SSClientSessionMgr> GSSClientSessionMgr = make_shared<SSClientSessionMgr>();

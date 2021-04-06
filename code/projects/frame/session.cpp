@@ -1,11 +1,3 @@
-/*
- * @Descripttion: 
- * @Author: zhengjinhong
- * @Date: 2020-03-18 20:44:08
- * @LastEditors: zhengjinhong
- * @LastEditTime: 2020-10-30 18:02:14
- */
-
 #include "session.h"
 #include "engine/inc/log/env.h"
 #include "google/protobuf/message.h"

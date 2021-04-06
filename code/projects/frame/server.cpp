@@ -1,11 +1,3 @@
-/*
- * @Descripttion: 
- * @Author: zhengjinhong
- * @Date: 2020-10-14 19:21:49
- * @LastEditors: zhengjinhong
- * @LastEditTime: 2021-01-21 17:47:08
- */
-
 #include "server.h"
 #include "engine/inc/common/iocontextpool.h"
 #include "engine/inc/log/env.h"
@@ -21,7 +13,6 @@
 using namespace std;
 
 bool IServerFacade::RegisterSignalHandler() {
-#if defined(__linux__)
   if (SIG_ERR == signal(SIGINT, OnSignalQuit)) {
     return false;
   }
@@ -41,7 +32,6 @@ bool IServerFacade::RegisterSignalHandler() {
   if (SIG_ERR == signal(SIGUSR2, OnSignalHandler)) {
     return false;
   }
-#endif
 
   return true;
 }
@@ -50,7 +40,7 @@ Server* GServer = nullptr;
 
 void Server::Quit() {
   terminate = true;
-  LogInfo("Server Quit");
+  LogInfoA("Server Quit");
 }
 
 bool Server::Init() {
@@ -63,17 +53,12 @@ bool Server::Init() {
   }
 
   //Set Server Attr
-  serverId   = GServerCfg->ServerId;
-  serverType = GServerCfg->ServerType;
-  token      = GServerCfg->Token;
-  serverName = GServerCfg->ServerName;
+  server_id   = GServerCfg->ServerId;
+  server_type = GServerCfg->ServerType;
+  token       = GServerCfg->Token;
+  server_name = GServerCfg->ServerName;
 
-  //Log
-#if defined(__linux__)
-  LOG_INIT(GServerCfg->LogDir, GServerCfg->ServerName, false, GServerCfg->LogLevel);
-#else
-  LOG_INIT(GServerCfg->LogDir, GServerCfg->ServerName, true, GServerCfg->LogLevel);
-#endif
+  LOG_INIT(GServerCfg->LogDir, GServerCfg->ServerName, GServerCfg->LogLevel);
 
   io_context_pool_ptr = make_shared<IOContextPool>();
   assert(io_context_pool_ptr);
@@ -82,7 +67,7 @@ bool Server::Init() {
     GServerCfg->ThreadNum = thread::hardware_concurrency();
   }
 
-  LogInfo("[Server] Init ThreadNum = {}", GServerCfg->ThreadNum);
+  LogInfoA("[Server] Init ThreadNum = {}", GServerCfg->ThreadNum);
   io_context_pool_ptr->Start(GServerCfg->ThreadNum, NET_LOOP_COUNT);
 
   GServer = this;

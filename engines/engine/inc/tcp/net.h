@@ -22,8 +22,7 @@ namespace Framework
             void PushEvent(shared_ptr<IEvent> event) override;
 
             // host 可以是域名,也可以是IP
-            void DoConnect(asio::io_context& io_context, const string& host, uint32_t port,
-                           shared_ptr<ISession> session_ptr) override;
+            void DoConnect(asio::io_context& io_context, const string& host, uint32_t port, shared_ptr<ISession> session_ptr) override;
 
             bool Run(uint32_t count) override;
 

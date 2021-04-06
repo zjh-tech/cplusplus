@@ -34,8 +34,7 @@ namespace Framework
             return add_timer(register_eid, delay, cb_func, true, true);
         }
 
-        bool TimerRegister::add_timer(uint32_t register_eid, time_t delay, const TimerFunc& cb_func, bool repeated,
-                                      bool replace)
+        bool TimerRegister::add_timer(uint32_t register_eid, time_t delay, const TimerFunc& cb_func, bool repeated, bool replace)
         {
             if ((uint64_t)delay == NOVALID_DELAY_MILL_MARCO)
             {
@@ -133,8 +132,7 @@ namespace Framework
                 }
                 else
                 {
-                    remain_time = timer->slot_ * TimeWheelMgr::s_slot_max_num +
-                                  (TimeWheelMgr::s_slot_max_num - cur_slot + timer->slot_);
+                    remain_time = timer->slot_ * TimeWheelMgr::s_slot_max_num + (TimeWheelMgr::s_slot_max_num - cur_slot + timer->slot_);
                 }
             }
 
@@ -149,8 +147,7 @@ namespace Framework
                 if (iter->second)
                 {
                     iter->second->state_ = eTimerState::Killed;
-                    LogDebugA("[timer]  kill timer enum_id = {},register_id = {}, timewheel_uid ={}",
-                              iter->second->register_eid_, iter->second->register_uid_, iter->second->timewheel_uid_);
+                    LogDebugA("[timer]  kill timer enum_id = {},register_id = {}, timewheel_uid ={}", iter->second->register_eid_, iter->second->register_uid_, iter->second->timewheel_uid_);
                 }
                 enum_map_.erase(iter);
             }
@@ -163,8 +160,7 @@ namespace Framework
                 if (iter->second)
                 {
                     iter->second->state_ = eTimerState::Killed;
-                    LogDebugA("[timer]  kill timer enum_id = {},register_id = {}, timewheel_uid ={}",
-                              iter->second->register_eid_, iter->second->register_uid_, iter->second->timewheel_uid_);
+                    LogDebugA("[timer]  kill timer enum_id = {},register_id = {}, timewheel_uid ={}", iter->second->register_eid_, iter->second->register_uid_, iter->second->timewheel_uid_);
                 }
             }
             enum_map_.clear();
@@ -176,8 +172,7 @@ namespace Framework
             // same enum_id timer delete after again add :  register_uid not same
             if (iter != enum_map_.end() && (iter->second->register_uid_ == timer_register_id))
             {
-                LogDebugA("[timer] TimerRegister remove timer enum_id = {},register_id = {}, timewheel_uid ={}",
-                          iter->second->register_eid_, iter->second->register_uid_, iter->second->timewheel_uid_);
+                LogDebugA("[timer] TimerRegister remove timer enum_id = {},register_id = {}, timewheel_uid ={}", iter->second->register_eid_, iter->second->register_uid_, iter->second->timewheel_uid_);
                 enum_map_.erase(iter);
             }
         }

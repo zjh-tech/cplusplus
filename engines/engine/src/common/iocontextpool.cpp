@@ -17,7 +17,7 @@ namespace Framework
         {
             auto processor               = make_shared<Processor>();
             processor->IoContextWorkPtr_ = make_shared<asio::io_context::work>(processor->IoContext_);
-            processor->ThreadPtr_ = make_shared<thread>([this, processor, loop_num]() { run(processor, loop_num); });
+            processor->ThreadPtr_        = make_shared<thread>([this, processor, loop_num]() { run(processor, loop_num); });
             processor_vec_.push_back(processor);
         }
     }

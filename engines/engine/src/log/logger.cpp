@@ -127,9 +127,7 @@ namespace Framework
             else
             {
                 std::tm* tm_last_ptr = std::localtime(&last_sec_);
-                create_file_flag =
-                    (tm_last_ptr->tm_year != tm_cur_ptr->tm_year) || (tm_last_ptr->tm_mon != tm_cur_ptr->tm_mon) ||
-                    (tm_last_ptr->tm_mday != tm_cur_ptr->tm_mday) || (tm_last_ptr->tm_hour != tm_cur_ptr->tm_hour);
+                create_file_flag     = (tm_last_ptr->tm_year != tm_cur_ptr->tm_year) || (tm_last_ptr->tm_mon != tm_cur_ptr->tm_mon) || (tm_last_ptr->tm_mday != tm_cur_ptr->tm_mday) || (tm_last_ptr->tm_hour != tm_cur_ptr->tm_hour);
             }
 
             if (create_file_flag == false)
@@ -148,15 +146,13 @@ namespace Framework
             }
 
             stringstream ss;
-            ss << path_ << "/" << (tm_cur_ptr->tm_year + 1900) << "_" << (tm_cur_ptr->tm_mon + 1) << "_"
-               << tm_cur_ptr->tm_mday;
+            ss << path_ << "/" << (tm_cur_ptr->tm_year + 1900) << "_" << (tm_cur_ptr->tm_mon + 1) << "_" << tm_cur_ptr->tm_mday;
             if (experimental::filesystem::v1::exists(ss.str().c_str()) == false)
             {
                 experimental::filesystem::v1::create_directories(ss.str().c_str());
             }
 
-            ss << "/" << (tm_cur_ptr->tm_year + 1900) << "_" << (tm_cur_ptr->tm_mon + 1) << "_" << tm_cur_ptr->tm_mday
-               << "_" << tm_cur_ptr->tm_hour << ".log";
+            ss << "/" << (tm_cur_ptr->tm_year + 1900) << "_" << (tm_cur_ptr->tm_mon + 1) << "_" << tm_cur_ptr->tm_mday << "_" << tm_cur_ptr->tm_hour << ".log";
 
             ofstream_ptr_ = make_shared<ofstream>(ss.str(), ios::out | ios::app);
             if (ofstream_ptr_ == nullptr)
@@ -199,8 +195,7 @@ namespace Framework
                 if (ofstream_ptr_ && has_flush_datas_flag_)
                 {
                     std::time_t now = std::time(nullptr);
-                    if ((last_flush_tick_ + async_flush_max_tick_) <= now ||
-                        evt_two_vector_ptr_->size() >= max_write_count)
+                    if ((last_flush_tick_ + async_flush_max_tick_) <= now || evt_two_vector_ptr_->size() >= max_write_count)
                     {
                         busy = true;
                         ofstream_ptr_->flush();
@@ -211,9 +206,7 @@ namespace Framework
 
                         if (qps_count == qps_loop_count)
                         {
-                            qps_end_tick = chrono::duration_cast<chrono::milliseconds>(
-                                               chrono::system_clock::now().time_since_epoch())
-                                               .count();
+                            qps_end_tick = chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch()).count();
                         }
                     }
                 }

@@ -28,8 +28,7 @@ namespace Framework
             {
             }
 
-            bool Start(const string& host, uint32_t port, shared_ptr<ISessionFactory> session_factory,
-                       ListenCbFunc fail_cb_func = nullptr);
+            bool Start(const string& host, uint32_t port, shared_ptr<ISessionFactory> session_factory, ListenCbFunc fail_cb_func = nullptr);
             void Stop();
 
         private:

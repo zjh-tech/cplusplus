@@ -15,6 +15,3 @@ add_subdirectory(hallserver)
 add_subdirectory(matchserver)
 add_subdirectory(battleserver)
 add_subdirectory(dbserver)
-
-
-#add_subdirectory(tsrank)

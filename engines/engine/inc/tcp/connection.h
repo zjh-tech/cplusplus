@@ -74,7 +74,7 @@ namespace Framework
 
             void add_check_send_end_timer(int mill_sec, bool terminate);
 
-            bool is_send_finish(); 
+            bool is_send_finish();
 
         private:
             vector<string>* send_vec_ptr_;

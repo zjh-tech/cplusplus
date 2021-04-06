@@ -1,11 +1,3 @@
-/*
- * @Descripttion: 
- * @Author: zhengjinhong
- * @Date: 2020-10-22 18:00:05
- * @LastEditors: zhengjinhong
- * @LastEditTime: 2020-11-05 10:33:03
- */
-
 #pragma once
 #include <cinttypes>
 #include <functional>
@@ -15,30 +7,34 @@ using namespace std;
 
 class SSServerSession;
 
-class ILogicServer {
+class ILogicServer
+{
 public:
-  virtual ~ILogicServer(){};
+    virtual ~ILogicServer(){};
 
-  virtual void Init()                                                                                                                                      = 0;
-  virtual void OnEstablish(shared_ptr<SSServerSession> sess)                                                                                               = 0;
-  virtual void OnTerminate(shared_ptr<SSServerSession> sess)                                                                                               = 0;
-  virtual void OnHandlerMsg(shared_ptr<SSServerSession> sess, uint32_t msg_id, const char* attach, uint32_t attach_len, const char* msg, uint32_t msg_len) = 0;
+    virtual void Init()                                                                                                                                      = 0;
+    virtual void OnEstablish(shared_ptr<SSServerSession> sess)                                                                                               = 0;
+    virtual void OnTerminate(shared_ptr<SSServerSession> sess)                                                                                               = 0;
+    virtual void OnHandlerMsg(shared_ptr<SSServerSession> sess, uint32_t msg_id, const char* attach, uint32_t attach_len, const char* msg, uint32_t msg_len) = 0;
 
-  inline void SetSession(shared_ptr<SSServerSession> sess) {
-    m_sess_ptr = sess;
-  }
+    inline void SetSession(shared_ptr<SSServerSession> sess)
+    {
+        m_sess_ptr = sess;
+    }
 
-  inline shared_ptr<SSServerSession> GetSession() {
-    return m_sess_ptr.lock();
-  }
+    inline shared_ptr<SSServerSession> GetSession()
+    {
+        return m_sess_ptr.lock();
+    }
 
 private:
-  weak_ptr<SSServerSession> m_sess_ptr;
+    weak_ptr<SSServerSession> m_sess_ptr;
 };
 
-class ILogicServerFactory {
+class ILogicServerFactory
+{
 public:
-  virtual ~ILogicServerFactory(){};
+    virtual ~ILogicServerFactory(){};
 
-  virtual void SetLogicServer(shared_ptr<SSServerSession> sess) = 0;
+    virtual void SetLogicServer(shared_ptr<SSServerSession> sess) = 0;
 };

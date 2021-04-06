@@ -52,8 +52,7 @@ namespace Framework
             });
         }
 
-        void Net::DoConnect(asio::io_context& io_context, const string& host, uint32_t port,
-                            shared_ptr<ISession> session_ptr)
+        void Net::DoConnect(asio::io_context& io_context, const string& host, uint32_t port, shared_ptr<ISession> session_ptr)
         {
             LogInfoA("[Net] DoConnect Host={}  Port={} ", host, port);
 
@@ -66,23 +65,20 @@ namespace Framework
             tcp::resolver resolver(io_context);
             auto result = resolver.resolve(host, std::to_string(port));
 
-            asio::async_connect(
-                conn_ptr->GetSocket(), result,
-                [this, conn_ptr, host, port, session_ptr](asio::error_code ec,
-                                                          typename decltype(result)::endpoint_type endpoint) {
-                    if (ec)
-                    {
-                        LogErrorA("[Net] DoConnect Host={} Port={} Error={} ", host, port, ec.message());
-                        conn_ptr->Close(false);
-                        return;
-                    }
+            asio::async_connect(conn_ptr->GetSocket(), result, [this, conn_ptr, host, port, session_ptr](asio::error_code ec, typename decltype(result)::endpoint_type endpoint) {
+                if (ec)
+                {
+                    LogErrorA("[Net] DoConnect Host={} Port={} Error={} ", host, port, ec.message());
+                    conn_ptr->Close(false);
+                    return;
+                }
 
-                    auto event_ptr = make_shared<Event>(eEventType::ConnEstablish, conn_ptr, session_ptr);
-                    PushEvent(event_ptr);
-                    LogInfoA("[Net] DoConnect Host={} Port={} Success", host, port);
+                auto event_ptr = make_shared<Event>(eEventType::ConnEstablish, conn_ptr, session_ptr);
+                PushEvent(event_ptr);
+                LogInfoA("[Net] DoConnect Host={} Port={} Success", host, port);
 
-                    conn_ptr->DoRead();
-                });
+                conn_ptr->DoRead();
+            });
         }
 
         bool Net::Run(uint32_t count)

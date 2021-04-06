@@ -1,11 +1,3 @@
-/*
- * @Descripttion: 
- * @Author: zhengjinhong
- * @Date: 2020-10-14 19:02:45
- * @LastEditors: zhengjinhong
- * @LastEditTime: 2021-01-19 15:55:59
- */
-
 #pragma once
 #include "engine/inc/tcp/env.h"
 #include <cinttypes>
@@ -36,15 +28,15 @@ public:
   void Quit();
 
   inline uint64_t GetServerId() {
-    return serverId;
+    return server_id;
   }
 
   inline uint32_t GetServerType() {
-    return serverType;
+    return server_type;
   }
 
-  inline string GetServerName() {
-    return serverName;
+  inline const string& GetServerName() {
+    return server_name;
   }
 
   inline const string& GetToken() {
@@ -64,11 +56,11 @@ public:
   }
 
 private:
-  bool                      terminate  = false;
-  uint64_t                  serverId   = 0;
-  uint32_t                  serverType = 0;
-  string                    serverName = "";
-  string                    token      = "";
+  bool                      terminate   = false;
+  uint64_t                  server_id   = 0;
+  uint32_t                  server_type = 0;
+  string                    server_name = "";
+  string                    token       = "";
   shared_ptr<IOContextPool> io_context_pool_ptr;
 };
 

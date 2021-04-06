@@ -8,10 +8,10 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
+#include <array>
 #include <asio/io_context.hpp>
 #include <asio/ip/udp.hpp>
 #include <asio/signal_set.hpp>
-#include <array>
 #include <ctime>
 #include <iostream>
 #include <syslog.h>
@@ -19,46 +19,40 @@
 
 using asio::ip::udp;
 
-class udp_daytime_server
-{
+class udp_daytime_server {
 public:
   udp_daytime_server(asio::io_context& io_context)
-    : socket_(io_context, {udp::v4(), 13})
-  {
+    : socket_(io_context, {udp::v4(), 13}) {
     receive();
   }
 
 private:
-  void receive()
-  {
+  void receive() {
     socket_.async_receive_from(
-        asio::buffer(recv_buffer_), remote_endpoint_,
-        [this](std::error_code ec, std::size_t /*n*/)
-        {
-          if (!ec)
-          {
-            using namespace std; // For time_t, time and ctime;
-            time_t now = time(0);
-            std::string message = ctime(&now);
+      asio::buffer(recv_buffer_), remote_endpoint_, [this](std::error_code ec, std::size_t /*n*/) {
+        if (!ec) {
+          using namespace std;  // For time_t, time and ctime;
+          time_t      now     = time(0);
+          std::string message = ctime(&now);
 
-            std::error_code ignored_ec;
-            socket_.send_to(asio::buffer(message),
-                remote_endpoint_, 0, ignored_ec);
-          }
+          std::error_code ignored_ec;
+          socket_.send_to(asio::buffer(message),
+                          remote_endpoint_,
+                          0,
+                          ignored_ec);
+        }
 
-          receive();
-        });
+        receive();
+      });
   }
 
-  udp::socket socket_;
-  udp::endpoint remote_endpoint_;
+  udp::socket         socket_;
+  udp::endpoint       remote_endpoint_;
   std::array<char, 1> recv_buffer_;
 };
 
-int main()
-{
-  try
-  {
+int main() {
+  try {
     asio::io_context io_context;
 
     // Initialise the server before becoming a daemon. If the process is
@@ -71,10 +65,9 @@ int main()
     // re-read of a configuration file.
     asio::signal_set signals(io_context, SIGINT, SIGTERM);
     signals.async_wait(
-        [&](std::error_code /*ec*/, int /*signo*/)
-        {
-          io_context.stop();
-        });
+      [&](std::error_code /*ec*/, int /*signo*/) {
+        io_context.stop();
+      });
 
     // Inform the io_context that we are about to become a daemon. The
     // io_context cleans up any internal resources, such as threads, that may
@@ -84,10 +77,8 @@ int main()
     // Fork the process and have the parent exit. If the process was started
     // from a shell, this returns control to the user. Forking a new process is
     // also a prerequisite for the subsequent call to setsid().
-    if (pid_t pid = fork())
-    {
-      if (pid > 0)
-      {
+    if (pid_t pid = fork()) {
+      if (pid > 0) {
         // We're in the parent process and need to exit.
         //
         // When the exit() function is used, the program terminates without
@@ -104,9 +95,7 @@ int main()
         //
         // should also precede the second fork().
         exit(0);
-      }
-      else
-      {
+      } else {
         syslog(LOG_ERR | LOG_USER, "First fork failed: %m");
         return 1;
       }
@@ -128,14 +117,10 @@ int main()
     umask(0);
 
     // A second fork ensures the process cannot acquire a controlling terminal.
-    if (pid_t pid = fork())
-    {
-      if (pid > 0)
-      {
+    if (pid_t pid = fork()) {
+      if (pid > 0) {
         exit(0);
-      }
-      else
-      {
+      } else {
         syslog(LOG_ERR | LOG_USER, "Second fork failed: %m");
         return 1;
       }
@@ -148,25 +133,22 @@ int main()
     close(2);
 
     // We don't want the daemon to have any standard input.
-    if (open("/dev/null", O_RDONLY) < 0)
-    {
+    if (open("/dev/null", O_RDONLY) < 0) {
       syslog(LOG_ERR | LOG_USER, "Unable to open /dev/null: %m");
       return 1;
     }
 
     // Send standard output to a log file.
-    const char* output = "/tmp/asio.daemon.out";
-    const int flags = O_WRONLY | O_CREAT | O_APPEND;
-    const mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
-    if (open(output, flags, mode) < 0)
-    {
+    const char*  output = "/tmp/asio.daemon.out";
+    const int    flags  = O_WRONLY | O_CREAT | O_APPEND;
+    const mode_t mode   = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
+    if (open(output, flags, mode) < 0) {
       syslog(LOG_ERR | LOG_USER, "Unable to open output file %s: %m", output);
       return 1;
     }
 
     // Also send standard error to the same log file.
-    if (dup(1) < 0)
-    {
+    if (dup(1) < 0) {
       syslog(LOG_ERR | LOG_USER, "Unable to dup output descriptor: %m");
       return 1;
     }
@@ -180,9 +162,7 @@ int main()
     syslog(LogInfoA | LOG_USER, "Daemon started");
     io_context.run();
     syslog(LogInfoA | LOG_USER, "Daemon stopped");
-  }
-  catch (std::exception& e)
-  {
+  } catch (std::exception& e) {
     syslog(LOG_ERR | LOG_USER, "Exception: %s", e.what());
     std::cerr << "Exception: " << e.what() << std::endl;
   }

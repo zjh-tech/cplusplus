@@ -1,11 +1,3 @@
-/*
- * @Descripttion: 
- * @Author: zhengjinhong
- * @Date: 2020-11-17 10:43:16
- * @LastEditors: zhengjinhong
- * @LastEditTime: 2020-11-17 10:55:20
- */
-
 #include "hallsession.h"
 
 void HallSession::Init() {

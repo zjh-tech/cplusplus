@@ -1,11 +1,3 @@
-/*
- * @Descripttion: 
- * @Author: zhengjinhong
- * @Date: 2021-01-18 15:20:33
- * @LastEditors: zhengjinhong
- * @LastEditTime: 2021-01-25 16:03:59
- */
-
 #pragma once
 
 #include "engine/inc/tcp/env.h"

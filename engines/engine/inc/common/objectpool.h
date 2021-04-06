@@ -250,8 +250,7 @@ namespace Framework
             LEAVE_LOCK();
             if (total_size != 0)
             {
-                LogInfoA("[ObjectPool]  {} ObjectPool Monitor TotalSize ={},FreeSize = {},UsePrecent = {}",
-                         typeid(T).name(), total_size, free_size, (total_size - free_size) * 100 / total_size);
+                LogInfoA("[ObjectPool]  {} ObjectPool Monitor TotalSize ={},FreeSize = {},UsePrecent = {}", typeid(T).name(), total_size, free_size, (total_size - free_size) * 100 / total_size);
             }
         }
 

@@ -1,11 +1,3 @@
-/*
- * @Descripttion: 
- * @Author: zhengjinhong
- * @Date: 2020-11-13 15:53:07
- * @LastEditors: zhengjinhong
- * @LastEditTime: 2020-12-18 11:38:01
- */
-
 #include "servermgr.h"
 #include "battlesession.h"
 #include "engine/inc/log/env.h"

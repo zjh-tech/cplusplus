@@ -106,8 +106,7 @@ namespace Framework
                     if (timer->rotation_ < 0)
                     {
                         busy = true;
-                        LogDebugA("[timer]  triggle timer id {}-{}-{}", timer->register_eid_, timer->register_uid_,
-                                  timer->timewheel_uid_);
+                        LogDebugA("[timer]  triggle timer id {}-{}-{}", timer->register_eid_, timer->register_uid_, timer->timewheel_uid_);
                         timer->cb_func_();
                         list_del_init(pos);
                         if (timer->repeat_flag_)
@@ -122,8 +121,7 @@ namespace Framework
                     }
                     else
                     {
-                        LogDebugA("[timer] remain rotation = {} remain sec ={}", timer->rotation_,
-                                  timer->rotation_ * s_slot_max_num);
+                        LogDebugA("[timer] remain rotation = {} remain sec ={}", timer->rotation_, timer->rotation_ * s_slot_max_num);
                     }
                 }
 
@@ -171,9 +169,7 @@ namespace Framework
             list_add_tail(&timer->list_, &slot_array_[timer->slot_]);
 
             uint64_t triggler_time = Utils::GetMillTime() + timer->delay_;
-            LogDebugA("[timer]  add timer id {}-{}-{} delay ={},rotation = {} curslot = {} slot = {},triggle time = {}",
-                      timer->register_eid_, timer->register_uid_, timer->timewheel_uid_, timer->delay_,
-                      timer->rotation_, cur_slot_, timer->slot_, triggler_time);
+            LogDebugA("[timer]  add timer id {}-{}-{} delay ={},rotation = {} curslot = {} slot = {},triggle time = {}", timer->register_eid_, timer->register_uid_, timer->timewheel_uid_, timer->delay_, timer->rotation_, cur_slot_, timer->slot_, triggler_time);
         }
 
         void TimeWheelMgr::release_timer(Timer* timer)
@@ -183,19 +179,16 @@ namespace Framework
             {
                 if (timer->state_ == eTimerState::Running)
                 {
-                    LogDebugA("[timer] TimeWheel release id {}-{}-{} state = Running", timer->register_eid_,
-                              timer->register_uid_, timer->timewheel_uid_);
+                    LogDebugA("[timer] TimeWheel release id {}-{}-{} state = Running", timer->register_eid_, timer->register_uid_, timer->timewheel_uid_);
                 }
                 else if (timer->state_ == eTimerState::Killed)
                 {
-                    LogDebugA("[timer] TimeWheel release id {}-{}-{} state = Killed", timer->register_eid_,
-                              timer->register_uid_, timer->timewheel_uid_);
+                    LogDebugA("[timer] TimeWheel release id {}-{}-{} state = Killed", timer->register_eid_, timer->register_uid_, timer->timewheel_uid_);
                 }
                 else
                 {
                     assert(false);
-                    LogDebugA("[timer] TimeWheel release id {}-{}-{} state = Unknown", timer->register_eid_,
-                              timer->register_uid_, timer->timewheel_uid_);
+                    LogDebugA("[timer] TimeWheel release id {}-{}-{} state = Unknown", timer->register_eid_, timer->register_uid_, timer->timewheel_uid_);
                 }
 
                 if (timer->timer_register_)

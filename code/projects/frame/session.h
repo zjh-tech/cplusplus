@@ -1,11 +1,3 @@
-/*
- * @Descripttion: 
- * @Author: zhengjinhong
- * @Date: 2020-10-20 15:06:32
- * @LastEditors: zhengjinhong
- * @LastEditTime: 2020-11-12 18:46:27
- */
-
 #pragma once
 
 #include "engine/inc/common/singleton.hpp"

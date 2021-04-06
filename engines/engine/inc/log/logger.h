@@ -41,9 +41,7 @@ namespace Framework
 
                 if (qps_count == 0)
                 {
-                    qps_start_tick =
-                        chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch())
-                            .count();
+                    qps_start_tick = chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch()).count();
                 }
 
                 if (stop_flag_)
@@ -83,8 +81,7 @@ namespace Framework
             }
 
             template <typename T, typename... Args>
-            void do_log(stringstream& ss, const vector<string>& fmt_vec, size_t& index, const T& first,
-                        const Args&... rest)
+            void do_log(stringstream& ss, const vector<string>& fmt_vec, size_t& index, const T& first, const Args&... rest)
             {
                 if (index > fmt_vec.size())
                 {

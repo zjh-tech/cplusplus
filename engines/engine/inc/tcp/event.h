@@ -20,8 +20,7 @@ namespace Framework
                 sess_ptr    = sess_ptr;
             }
 
-            Event(eEventType evt_type, shared_ptr<IConnection> conn_ptr, shared_ptr<ISession> sess_ptr,const string& datas)
-                : datas_(datas)
+            Event(eEventType evt_type, shared_ptr<IConnection> conn_ptr, shared_ptr<ISession> sess_ptr, const string& datas) : datas_(datas)
             {
                 event_type_ = evt_type;
                 conn_ptr_   = conn_ptr;

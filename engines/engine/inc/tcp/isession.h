@@ -64,10 +64,8 @@ namespace Framework
             virtual void SetAttachData(any attach) = 0;
             virtual any GetAttachData()            = 0;
 
-            virtual void AsyncSendBytes(uint32_t msg_id, const char* msg, uint32_t len,
-                                        IAttachParas* attach = nullptr)    = 0;
-            virtual void AsyncSendProtoMsg(uint32_t msg_id, const google::protobuf::Message& msg,
-                                           IAttachParas* attach = nullptr) = 0;
+            virtual void AsyncSendBytes(uint32_t msg_id, const char* msg, uint32_t len, IAttachParas* attach = nullptr)           = 0;
+            virtual void AsyncSendProtoMsg(uint32_t msg_id, const google::protobuf::Message& msg, IAttachParas* attach = nullptr) = 0;
 
             virtual void OnEstablish()                              = 0;
             virtual void OnTerminate()                              = 0;

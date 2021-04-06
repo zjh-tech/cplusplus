@@ -26,6 +26,6 @@ namespace Framework
             virtual shared_ptr<ISession> GetSessPtr()    = 0;
             virtual string& GetDatas()                   = 0;
         };
-        
+
     }  // namespace Tcp
 }  // namespace Framework

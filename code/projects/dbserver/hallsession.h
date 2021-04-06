@@ -1,11 +1,3 @@
-/*
- * @Descripttion: 
- * @Author: zhengjinhong
- * @Date: 2020-11-17 10:43:08
- * @LastEditors: zhengjinhong
- * @LastEditTime: 2020-11-17 10:56:29
- */
-
 #pragma once
 
 #include "frame/ilogicserver.h"

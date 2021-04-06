@@ -1,11 +1,3 @@
-/*
- * @Descripttion: 
- * @Author: zhengjinhong
- * @Date: 2020-10-19 11:44:44
- * @LastEditors: zhengjinhong
- * @LastEditTime: 2020-12-24 15:38:37
- */
-
 #pragma once
 
 #include "session.h"

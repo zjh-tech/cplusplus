@@ -19,8 +19,7 @@ namespace Framework
             io_context_pool_ = io_context_pool;
         }
 
-        bool Listener::Start(const string& host, uint32_t port, shared_ptr<ISessionFactory> session_factory,
-                             ListenCbFunc fail_cb_func)
+        bool Listener::Start(const string& host, uint32_t port, shared_ptr<ISessionFactory> session_factory, ListenCbFunc fail_cb_func)
         {
             host_            = host;
             port_            = port;

@@ -29,8 +29,7 @@ namespace Framework
             virtual ~MysqlModule();
 
         public:
-            bool Init(vector<DBConnSpec>& conn_specs_vec, uint32_t table_max_count, uint32_t conn_max_count,
-                      shared_ptr<IOContextPool> processor_pool);
+            bool Init(vector<DBConnSpec>& conn_specs_vec, uint32_t table_max_count, uint32_t conn_max_count, shared_ptr<IOContextPool> processor_pool);
 
             bool Run(uint32_t count);
 

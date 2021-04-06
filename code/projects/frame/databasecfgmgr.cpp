@@ -1,10 +1,4 @@
-/*
- * @Descripttion: 
- * @Author: zhengjinhong
- * @Date: 2020-11-23 18:07:30
- * @LastEditors: zhengjinhong
- * @LastEditTime: 2020-11-25 11:31:25
- */
+
 #include "databasecfgmgr.h"
 #include "engine/inc/common/convert.hpp"
 #include "tinyxml2.h"

@@ -1,10 +1,3 @@
-/*
- * @Descripttion: 
- * @Author: zhengjinhong
- * @Date: 2020-10-19 11:48:09
- * @LastEditors: zhengjinhong
- * @LastEditTime: 2020-12-24 15:41:31
- */
 #pragma once
 
 #include "engine/inc/timer/env.h"
