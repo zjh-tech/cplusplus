@@ -38,7 +38,7 @@ public:
     void FillNetStream(NetStream& out_stream) override;
 
 private:
-    MsgHeader m_msg_header;
+    MsgHeader msg_header;
 
     const uint32_t msg_header_size = 6;
 };

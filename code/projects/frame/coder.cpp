@@ -11,10 +11,10 @@ uint32_t Coder::GetBodyLen(char* data)
 {
     uint32_t headerLen = GetHeaderLen();
     NetStream stream(data, headerLen);
-    stream >> m_msg_header.encode_flag;
-    stream >> m_msg_header.zip_flag;
-    stream >> m_msg_header.body_len;
-    return m_msg_header.body_len;
+    stream >> msg_header.encode_flag;
+    stream >> msg_header.zip_flag;
+    stream >> msg_header.body_len;
+    return msg_header.body_len;
 }
 
 bool Coder::EncodeBody(string& content)
@@ -26,7 +26,7 @@ bool Coder::EncodeBody(string& content)
 
 void Coder::DecodeBody(string& content)
 {
-    if (!m_msg_header.encode_flag)
+    if (!msg_header.encode_flag)
     {
         return;
     }
@@ -39,7 +39,7 @@ bool Coder::ZipBody(string& content)
 
 bool Coder::UnzipBody(string& content)
 {
-    if (!m_msg_header.zip_flag)
+    if (!msg_header.zip_flag)
     {
         return true;
     }
